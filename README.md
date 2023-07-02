@@ -23,10 +23,20 @@ If you have credentials, such as in the Love Sandwiches project, you must create
 
 Connect your GitHub repository and deploy as normal.
 
+# Dependencies
+
+To run this application locally you need to install pandas.
+Pandas was installed by running pip3 install pandas in the terminal and inserting import pandas as pd in the run.py file.
+Pandas Datareader was installed by running pip3 install pandas-datareader in the terminal and inserting import pandas_datareader.data as web in the run.py file. 
+
 ## Constraints
 
 The deployment terminal is set to 80 columns by 24 rows. That means that each line of text needs to be 80 characters or less otherwise it will be wrapped onto a second line.
 
+## References 
+[QuantDare's articule](https://quantdare.com/correlation-prices-returns/) was used to determine whether to calculate correlation on returns or prices between equities. 
+
+[codeCademy](www.codecademy.com) course Python for Finance was used to assist in scraping financial data and creating foundational functions such as variance, standard deviation and correlation coefficient
 ---
 
 Happy coding!
