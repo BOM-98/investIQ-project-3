@@ -8,15 +8,14 @@ import yfinance as yf
 from yahoo_fin import stock_info as si
 import scipy.stats as stats
 
+start = dt.datetime.now() - dt.timedelta(days=365)
+end = dt.datetime.now()
+
 # Calculate Log Return
-
-
 def calculate_log_return(start_price, end_price):
     return log(end_price / start_price)
 
 # Calculate Variance
-
-
 def calculate_variance(dataset):
     numerator = 0
     mean = sum(dataset)/len(dataset)
@@ -29,8 +28,6 @@ def calculate_variance(dataset):
     return variance
 
 # Calculate Standard Deviation
-
-
 def calculate_stddev(dataset):
     variance = calculate_variance(dataset)
     stddev = sqrt(variance)
@@ -38,7 +35,6 @@ def calculate_stddev(dataset):
 
 
 # Calculate Correlation Coefficient
-
 def calculate_correlation(set_x, set_y):
     # Sum of all values in each dataset
     sum_x = sum(set_x)
@@ -143,3 +139,21 @@ def rank_stocks(df):
     df['score'] = df['forwardPE'] * 0.1 + df['forwardEps'] * 0.1 + df['debtToEquity'] * 0.1 + df['returnOnEquity'] * \
         0.1 + df['returnOnAssets']*0.1 + df['revenueGrowth'] * 0.2 + \
         df['quickRatio'] * 0.1 + df['quarterlyReturn'] * 0.2
+
+def calculate_quarterly_return(ticker, start, end):
+    try:
+        data = yf.download(ticker, start=start, end=end, progress=False)
+        data['quarterly_return'] = data['Adj Close'].resample('Q').ffill().pct_change()
+        return data.loc['2023-06-30', 'quarterly_return']
+    except Exception as e:
+        print(f"Failed to download data for {ticker}. Error: {e}")
+        return np.nan
+    
+    
+# Step 2: Data Processing
+def process_data(tickers):
+    index = 0
+    returns_list = []
+    for ticker in tickers:
+        returns_list.append(calculate_quarterly_return(ticker, start, end))
+    return returns_list
