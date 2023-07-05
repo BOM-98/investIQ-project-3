@@ -11,6 +11,89 @@ import scipy.stats as stats
 start = dt.datetime.now() - dt.timedelta(days=365)
 end = dt.datetime.now()
 
+def get_companies_list():
+    """
+    Get the index from which stocks are to be picked from the user.
+    """
+    # URL of the Wikipedia page from which to scrape the S&P 500 company list
+    url_sap_500 = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
+    # URL of the Wikipedia page from which to scrape the Dow Jones company list
+    url_dow = 'https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average'
+    #URL of the Wikipedia page from which to scrape the S&P 100 company list
+    url_sap_100 = 'https://en.wikipedia.org/wiki/S%26P_100'
+    
+    while True:
+        print("Please choose which stock index you would like to pick stocks from.")
+        print("The larger the index, the longer it will take to analyse the stocks")
+        print("1: 'dow': 30 companies from the Dow Jones (fast analysis time ~ 1 min)")
+        print("2: 'sap100': 100 companies from the S&P100 (slow analysis time ~ 3 min)")
+        print("3: 'sap100': 500 companies from the S&P500 (slowest analysis time ~ 6 min)")
+        print("Example: 'dow' chooses the Dow Jones  (30) \n")
+
+        index_choice = input("Enter your index here: ")
+
+        if validate_index(index_choice):
+            print("Data is valid")
+            break
+
+    if index_choice == 'dow':
+        tickers_source = url_dow
+    elif index_choice == 'sap100':
+        tickers_source = url_sap_100
+    elif index_choice == 'sap500':
+        tickers_source = url_sap_500
+    
+    return tickers_source
+
+
+def validate_index(index_choice):
+    """
+    Determines whether the use choice of index was valid
+    """
+    try:
+        if index_choice != 'dow' and index_choice != 'sap100'and index_choice != 'sap500':
+            raise ValueError(
+                f"You have not chosen a valid option: choose either 'dow', 'sap100', or 'sap500' "
+            )
+    except ValueError as e:
+        print(f"Invalid data: {e}, please try again.\n")
+        return False
+
+    return True
+
+def scrape_company_tickers(index):
+    """
+    Scrape the company tickers from the Wikipedia page of a given index.
+
+    This function scrapes the company tickers from the Wikipedia page of the S&P 500, S&P 100, or Dow Jones Industrial Average index. 
+    It uses pandas to scrape the tables from the Wikipedia page and extracts the 'Symbol' column, which contains the ticker symbols.
+
+    Parameters:
+    index (str): The URL of the Wikipedia page of the index. It should be one of the following:
+        - 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies' for the S&P 500 index
+        - 'https://en.wikipedia.org/wiki/S%26P_100' for the S&P 100 index
+        - 'https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average' for the Dow Jones Industrial Average index
+
+    Returns:
+    symbols (Series): A pandas Series containing the ticker symbols of the companies in the index.
+    """
+    # Use pandas to scrape the tables from the Wikipedia page
+    # The first table on the page is the one we want
+    # The ticker symbol is in the 'Symbol' column
+    if index == 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies':
+        tables = pd.read_html(index)
+        tabel = tables[0]
+        symbols = tabel['Symbol']
+    elif index == 'https://en.wikipedia.org/wiki/S%26P_100':
+        tables = pd.read_html(index)
+        tabel = tables[2]
+        symbols = tabel['Symbol']
+    elif index == 'https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average':
+        tables = pd.read_html(index)
+        tabel = tables[1]
+        symbols = tabel['Symbol']
+    return symbols
+
 # Calculate Log Return
 def calculate_log_return(start_price, end_price):
     return log(end_price / start_price)
@@ -70,39 +153,7 @@ def calculate_percentile_rank(df):
     return ranked_percentiles
 
 
-def scrape_company_tickers(index):
-    """
-    Scrape the company tickers from the Wikipedia page of a given index.
 
-    This function scrapes the company tickers from the Wikipedia page of the S&P 500, S&P 100, or Dow Jones Industrial Average index. 
-    It uses pandas to scrape the tables from the Wikipedia page and extracts the 'Symbol' column, which contains the ticker symbols.
-
-    Parameters:
-    index (str): The URL of the Wikipedia page of the index. It should be one of the following:
-        - 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies' for the S&P 500 index
-        - 'https://en.wikipedia.org/wiki/S%26P_100' for the S&P 100 index
-        - 'https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average' for the Dow Jones Industrial Average index
-
-    Returns:
-    symbols (Series): A pandas Series containing the ticker symbols of the companies in the index.
-    """
-    # Use pandas to scrape the tables from the Wikipedia page
-    # The first table on the page is the one we want
-    # The ticker symbol is in the 'Symbol' column
-    if index == 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies':
-        tables = pd.read_html(index)
-        tabel = tables[0]
-        symbols = tabel['Symbol']
-    elif index == 'https://en.wikipedia.org/wiki/S%26P_100':
-        tables = pd.read_html(index)
-        tabel = tables[2]
-        symbols = tabel['Symbol']
-    elif index == 'https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average':
-        tables = pd.read_html(index)
-        tabel = tables[1]
-        symbols = tabel['Symbol']
-
-    return symbols
 
 
 # rank the stocks by percentiles
@@ -148,8 +199,7 @@ def calculate_quarterly_return(ticker, start, end):
     except Exception as e:
         print(f"Failed to download data for {ticker}. Error: {e}")
         return np.nan
-    
-    
+        
 # Step 2: Data Processing
 def process_data(tickers):
     index = 0
@@ -157,3 +207,19 @@ def process_data(tickers):
     for ticker in tickers:
         returns_list.append(calculate_quarterly_return(ticker, start, end))
     return returns_list
+
+
+def collect_data(symbols):
+    print('calculating your company fundamentals - this may take a minute or two...')
+    stocks_list = []
+    for ticker in symbols:
+        stocks_list.append(yf.Ticker(ticker).info)
+
+    # Create a list of fundamental information that we are interested in
+    fundamentals = ['symbol', 'marketCap', 'forwardPE', 'priceToBook', 'forwardEps',
+                    'debtToEquity', 'returnOnEquity', 'returnOnAssets', 'revenueGrowth', 'quickRatio', 'dividendYield']
+    # Create a DataFrame from the info dictionary
+    stock_data = pd.DataFrame(stocks_list)
+    # # Select only the columns in the fundamentals list
+    fundamentals_data = stock_data[fundamentals]
+    return fundamentals_data
