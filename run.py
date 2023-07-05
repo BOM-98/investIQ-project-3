@@ -89,7 +89,12 @@ print(fundamentals_percentile)
 
 
 #rank the stocks by percentiles
-#step 1: determine the important factors and the weighting for each factor
-factor_weights = [['forwardPE', 0.1],['forwardEps', 0.1],['debtToEquity', 0.1],['returnOnEquity', 0.1],['returnOnAssets', 0.1],['revenueGrowth', 0.2], ['quickRatio', 0.1], ['quarterlyReturn', 0.2]]
-#step 2: multiply each factor percentile by its weighting to get a score
-#step 3: add each score to the percentile_data dataframe
+def rank_stocks(df):
+    #step 1: determine the important factors and the weighting for each factor
+    #factor_weights = [['forwardPE', 0.1],['forwardEps', 0.1],['debtToEquity', 0.1],['returnOnEquity', 0.1],['returnOnAssets', 0.1],['revenueGrowth', 0.2], ['quickRatio', 0.1], ['quarterlyReturn', 0.2]]
+    #step 2: multiply each factor percentile by its weighting to get a score
+    df['score'] = df['forwardPE'] * 0.1 + df['forwardEps'] * 0.1 + df['debtToEquity'] * 0.1 + df['returnOnEquity'] * 0.1 + df['returnOnAssets']*0.1 + df['revenueGrowth'] * 0.2 + df['quickRatio'] * 0.1 + df['quarterlyReturn'] * 0.2
+
+rank_stocks(fundamentals_percentile)
+fundamentals_percentile.sort_values('score', ascending = False, inplace = True)
+print(fundamentals_percentile)

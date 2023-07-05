@@ -62,10 +62,11 @@ def calculate_correlation(set_x, set_y):
 
 
 def calculate_percentile_rank(df):
-    ranked_percentiles = df.apply(lambda x: [stats.percentileofscore(x, a, 'rank') if pd.notnull(a) else np.nan for a in x])
-    
+    ranked_percentiles = df.apply(lambda x: [stats.percentileofscore(
+        x, a, 'rank') if pd.notnull(a) else np.nan for a in x])
+
     columns_to_inverse = ['forwardPE', 'debtToEquity']
-    
+
     for column in columns_to_inverse:
         if column in ranked_percentiles:
             ranked_percentiles[column] = 100 - ranked_percentiles[column]
@@ -104,5 +105,41 @@ def scrape_company_tickers(index):
         tables = pd.read_html(index)
         tabel = tables[1]
         symbols = tabel['Symbol']
-        
+
     return symbols
+
+
+# rank the stocks by percentiles
+def rank_stocks(df):
+    """
+    Using a variety of criteria, this function determines a score for each stock from the DataFrame passed as a parameter. 
+
+
+    The score is the sum of the products of each factor's weight and its respective weighting for each factor. 
+    Forward PE, Forward EPS, Debt to Equity, Return on Equity, Return on Assets, Revenue Growth, Quick Ratio, 
+    and Quarterly Return are the aspects taken into account.
+
+    Factor_weights = [['forwardPE', 0.1],['forwardEps', 0.1],['debtToEquity', 0.1],['returnOnEquity', 0.1],['returnOnAssets', 0.1],['revenueGrowth', 0.2], ['quickRatio', 0.1], ['quarterlyReturn', 0.2]]
+
+    Parameters:
+    df (pandas.DataFrame): A DataFrame containing the factors for each stock. The DataFrame 
+    should have the factors as columns and each row represents a stock.
+
+    Returns:
+    pandas.DataFrame: The input DataFrame with an additional column 'score' that contains the 
+    calculated score for each stock.
+
+    Example:
+    >>> df =            forwardPE  debtToEquity  forwardEps  returnOnEquity  returnOnAssets  revenueGrowth  quickRatio  quarterlyReturn
+    symbols                                                                                                                 
+    MMM                    81.82         36.36       50.00           77.27           40.91          13.64       40.91            13.64
+    AXP                    50.00         22.73       77.27           63.64           18.18          90.91       86.36            72.73
+    AMGN                   68.18         -0.00       90.91          100.00           59.09          31.82      100.00             9.09
+    ... })
+    >>> rank_stocks(df)
+    """
+
+    # step 2: multiply each factor percentile by its weighting to get a score
+    df['score'] = df['forwardPE'] * 0.1 + df['forwardEps'] * 0.1 + df['debtToEquity'] * 0.1 + df['returnOnEquity'] * \
+        0.1 + df['returnOnAssets']*0.1 + df['revenueGrowth'] * 0.2 + \
+        df['quickRatio'] * 0.1 + df['quarterlyReturn'] * 0.2
