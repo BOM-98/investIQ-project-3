@@ -62,7 +62,15 @@ def calculate_correlation(set_x, set_y):
 
 
 def calculate_percentile_rank(df):
-    return df.apply(lambda x: [stats.percentileofscore(x.dropna(), a, 'rank') if pd.notnull(a) else np.nan for a in x])
+    ranked_percentiles = df.apply(lambda x: [stats.percentileofscore(x, a, 'rank') if pd.notnull(a) else np.nan for a in x])
+    
+    columns_to_inverse = ['forwardPE', 'debtToEquity']
+    
+    for column in columns_to_inverse:
+        if column in ranked_percentiles:
+            ranked_percentiles[column] = 100 - ranked_percentiles[column]
+    ranked_percentiles = ranked_percentiles.round(2)
+    return ranked_percentiles
 
 
 def scrape_company_tickers(index):

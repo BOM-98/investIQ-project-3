@@ -77,14 +77,19 @@ print('Here are the fundamentals for your list of companies: \n')
 print('----------------------------------------------------')
 print(fundamentals_data)
 
-fundamentals_percentile = calculate_percentile_rank(fundamentals_data[['marketCap', 'forwardPE', 'priceToBook', 'forwardEps',
-                    'debtToEquity', 'returnOnEquity', 'returnOnAssets', 'revenueGrowth', 'quickRatio', 'dividendYield', 'quarterlyReturn']])
+fundamentals_data_dropna = fundamentals_data.dropna()
+fundamentals_percentile = calculate_percentile_rank(fundamentals_data_dropna[['forwardPE', 'debtToEquity','forwardEps', 'returnOnEquity', 'returnOnAssets', 'revenueGrowth', 'quickRatio', 'quarterlyReturn']])
 fundamentals_percentile['symbols'] = symbols
 fundamentals_percentile.set_index('symbols', inplace=True)
-
-fundamentals_percentile = fundamentals_percentile.dropna()
 
 print ('---------------------------------------------------- \n')
 print('Here are the fundamentals for your list of companies ranked as a percentile: \n')
 print('----------------------------------------------------')
 print(fundamentals_percentile)
+
+
+#rank the stocks by percentiles
+#step 1: determine the important factors and the weighting for each factor
+factor_weights = [['forwardPE', 0.1],['forwardEps', 0.1],['debtToEquity', 0.1],['returnOnEquity', 0.1],['returnOnAssets', 0.1],['revenueGrowth', 0.2], ['quickRatio', 0.1], ['quarterlyReturn', 0.2]]
+#step 2: multiply each factor percentile by its weighting to get a score
+#step 3: add each score to the percentile_data dataframe
