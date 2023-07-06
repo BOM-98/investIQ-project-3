@@ -1,7 +1,10 @@
 # Write your code to expect a terminal of 80 characters wide and 24 rows high
 from math import sqrt
 import pandas as pd
+import pandas_datareader.data as web
 import numpy as np
+import random
+from functools import reduce
 import datetime as dt
 from datetime import datetime
 import yfinance as yf
@@ -11,6 +14,7 @@ import scipy.stats as stats
 start = dt.datetime.now() - dt.timedelta(days=365)
 end = dt.datetime.now()
 
+
 def get_companies_list():
     """
     Get the index from which stocks are to be picked from the user.
@@ -19,15 +23,15 @@ def get_companies_list():
     url_sap_500 = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
     # URL of the Wikipedia page from which to scrape the Dow Jones company list
     url_dow = 'https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average'
-    #URL of the Wikipedia page from which to scrape the S&P 100 company list
+    # URL of the Wikipedia page from which to scrape the S&P 100 company list
     url_sap_100 = 'https://en.wikipedia.org/wiki/S%26P_100'
-    
+
     while True:
         print("Please choose which stock index you would like to pick stocks from.")
         print("The larger the index, the longer it will take to analyse the stocks")
         print("1: 'dow': 30 companies from the Dow Jones (fast analysis time ~ 1 min)")
         print("2: 'sap100': 100 companies from the S&P100 (slow analysis time ~ 3 min)")
-        print("3: 'sap100': 500 companies from the S&P500 (slowest analysis time ~ 6 min)")
+        print("3: 'sap500': 500 companies from the S&P500 (slowest analysis time ~ 6 min)")
         print("Example: 'dow' chooses the Dow Jones  (30) \n")
 
         index_choice = input("Enter your index here: ")
@@ -42,7 +46,7 @@ def get_companies_list():
         tickers_source = url_sap_100
     elif index_choice == 'sap500':
         tickers_source = url_sap_500
-    
+
     return tickers_source
 
 
@@ -51,7 +55,7 @@ def validate_index(index_choice):
     Determines whether the use choice of index was valid
     """
     try:
-        if index_choice != 'dow' and index_choice != 'sap100'and index_choice != 'sap500':
+        if index_choice != 'dow' and index_choice != 'sap100' and index_choice != 'sap500':
             raise ValueError(
                 f"You have not chosen a valid option: choose either 'dow', 'sap100', or 'sap500' "
             )
@@ -60,6 +64,7 @@ def validate_index(index_choice):
         return False
 
     return True
+
 
 def scrape_company_tickers(index):
     """
@@ -95,10 +100,14 @@ def scrape_company_tickers(index):
     return symbols
 
 # Calculate Log Return
+
+
 def calculate_log_return(start_price, end_price):
     return log(end_price / start_price)
 
 # Calculate Variance
+
+
 def calculate_variance(dataset):
     numerator = 0
     mean = sum(dataset)/len(dataset)
@@ -111,6 +120,8 @@ def calculate_variance(dataset):
     return variance
 
 # Calculate Standard Deviation
+
+
 def calculate_stddev(dataset):
     variance = calculate_variance(dataset)
     stddev = sqrt(variance)
@@ -153,9 +164,6 @@ def calculate_percentile_rank(df):
     return ranked_percentiles
 
 
-
-
-
 # rank the stocks by percentiles
 def rank_stocks(df):
     """
@@ -191,16 +199,20 @@ def rank_stocks(df):
         0.1 + df['returnOnAssets']*0.1 + df['revenueGrowth'] * 0.2 + \
         df['quickRatio'] * 0.1 + df['quarterlyReturn'] * 0.2
 
+
 def calculate_quarterly_return(ticker, start, end):
     try:
         data = yf.download(ticker, start=start, end=end, progress=False)
-        data['quarterly_return'] = data['Adj Close'].resample('Q').ffill().pct_change()
+        data['quarterly_return'] = data['Adj Close'].resample(
+            'Q').ffill().pct_change()
         return data.loc['2023-06-30', 'quarterly_return']
     except Exception as e:
         print(f"Failed to download data for {ticker}. Error: {e}")
         return np.nan
-        
+
 # Step 2: Data Processing
+
+
 def process_data(tickers):
     index = 0
     returns_list = []
@@ -213,6 +225,7 @@ def collect_data(symbols):
     print('calculating your company fundamentals - this may take a minute or two...')
     stocks_list = []
     for ticker in symbols:
+        print(f"Fetching data for {ticker}")
         stocks_list.append(yf.Ticker(ticker).info)
 
     # Create a list of fundamental information that we are interested in
@@ -223,3 +236,140 @@ def collect_data(symbols):
     # # Select only the columns in the fundamentals list
     fundamentals_data = stock_data[fundamentals]
     return fundamentals_data
+
+
+def return_portfolios(expected_returns, cov_matrix):
+    np.random.seed(1)
+    port_returns = []
+    port_volatility = []
+    stock_weights = []
+
+    selected = (expected_returns.axes)[0]
+
+    num_assets = len(selected)
+    num_portfolios = 5000
+
+    for single_portfolio in range(num_portfolios):
+        weights = np.random.random(num_assets)
+        weights /= np.sum(weights)
+        returns = np.dot(weights, expected_returns)
+        volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
+        port_returns.append(returns)
+        port_volatility.append(volatility)
+        stock_weights.append(weights)
+
+        portfolio = {'Returns': port_returns,
+                     'Volatility': port_volatility}
+
+    for counter, symbol in enumerate(selected):
+        portfolio[symbol + ' Weight'] = [Weight[counter]
+                                         for Weight in stock_weights]
+
+    df = pd.DataFrame(portfolio)
+
+    column_order = ['Returns', 'Volatility'] + \
+        [stock+' Weight' for stock in selected]
+
+    df = df[column_order]
+
+    return df
+
+
+def optimal_portfolio(returns):
+    n = returns.shape[1]
+    returns = np.transpose(returns.as_matrix())
+
+    N = 100
+    mus = [10**(5.0 * t/N - 1.0) for t in range(N)]
+
+    # Convert to cvxopt matrices
+    S = opt.matrix(np.cov(returns))
+    pbar = opt.matrix(np.mean(returns, axis=1))
+
+    # Create constraint matrices
+    G = -opt.matrix(np.eye(n))   # negative n x n identity matrix
+    h = opt.matrix(0.0, (n, 1))
+    A = opt.matrix(1.0, (1, n))
+    b = opt.matrix(1.0)
+
+    # Calculate efficient frontier weights using quadratic programming
+    portfolios = [solvers.qp(mu*S, -pbar, G, h, A, b)['x']
+                  for mu in mus]
+    # CALCULATE RISKS AND RETURNS FOR FRONTIER
+    returns = [blas.dot(pbar, x) for x in portfolios]
+    risks = [np.sqrt(blas.dot(x, S*x)) for x in portfolios]
+    # CALCULATE THE 2ND DEGREE POLYNOMIAL OF THE FRONTIER CURVE
+    m1 = np.polyfit(returns, risks, 2)
+    x1 = np.sqrt(m1[2] / m1[0])
+    # CALCULATE THE OPTIMAL PORTFOLIO
+    wt = solvers.qp(opt.matrix(x1 * S), -pbar, G, h, A, b)['x']
+    return np.asarray(wt), returns, risks
+
+
+def choose_companies(df):
+    """
+    Get the number of companies the user wants to pull from the scored list.
+    """
+
+    while True:
+        print("-----------------------------------------------------------\n")
+        print("Your companies are now ranked based on their fundamentals.")
+        print("You can see the 'score' assigned to each one of them under the 'score' column in the table above")
+        print("Please choose how many companies you would like to include from this list in your portfolio")
+        print("Example: '10' chooses the top 10 companies from this list \n")
+        print("-----------------------------------------------------------\n")
+        print("You can choose a max of 50 companies in the case of the S&P 100 and 500 \n")
+
+        portfolio_size = input("Enter your number here: ")
+        portfolio_size = int(portfolio_size)
+
+        if validate_number(portfolio_size, df):
+            print("Data is valid")
+            break
+
+    portfolio_df = df.head(portfolio_size)
+
+    return portfolio_df
+
+
+def validate_number(portfolio_size, df):
+    """
+    Determines whether the choice of companies was valid
+    """
+    try:
+        if int(portfolio_size) > 50 or int(portfolio_size) > df['symbols'].count():
+            raise ValueError(
+                f"You have not chosen a valid portfolio size"
+            )
+    except ValueError as e:
+        print(f"Invalid data: {e}, please try again.\n")
+        return False
+
+    return True
+
+# def get_stock(ticker):
+#     print(f"Fetching data for {ticker}")
+#     data = web.DataReader(f"{ticker}","yahoo",start,end)
+#     data[f'{ticker}'] = data["Close"]
+#     data = data[[f'{ticker}']]
+#     print(data.head())
+#     return data
+
+
+def pull_returns(ticker, start, end):
+    try:
+        print(f"Fetching data for {ticker}")
+        data = yf.download(ticker, start=start, end=end, progress=False)
+        return data['Adj Close']
+    except Exception as e:
+        print(f"Failed to download data for {ticker}. Error: {e}")
+        return np.nan
+
+
+def combine_stocks(tickers):
+    data_frames = pd.DataFrame()
+    for i in tickers:
+        data_frames[i] = (pull_returns(i, start, end))
+
+    print(data_frames)
+    return data_frames

@@ -24,7 +24,6 @@ fundamentals_data_dropna = fundamentals_data.dropna()
 removed_companies = fundamentals_data['symbol'].count() - fundamentals_data_dropna['symbol'].count()
 fundamentals_percentile = calculate_percentile_rank(fundamentals_data_dropna[['forwardPE', 'debtToEquity','forwardEps', 'returnOnEquity', 'returnOnAssets', 'revenueGrowth', 'quickRatio', 'quarterlyReturn']])
 fundamentals_percentile['symbols'] = symbols
-#fundamentals_percentile.set_index('symbols', drop=False, inplace=True)
 fundamentals_percentile = fundamentals_percentile[['symbols','forwardPE','debtToEquity','forwardEps', 'returnOnEquity', 'returnOnAssets', 'revenueGrowth', 'quickRatio', 'quarterlyReturn']]
 
 print ('---------------------------------------------------- \n')
@@ -38,3 +37,12 @@ fundamentals_percentile = fundamentals_percentile.reset_index(drop=True)
 print(fundamentals_percentile)
 print('\n ----------------------------------------------------')
 print(str(removed_companies) + ' stocks removed due to missing data fields from Yahoo Finance')
+
+portfolio = choose_companies(fundamentals_percentile)
+
+print('here is your portfolio of companies: \n')
+print(portfolio)
+
+portfolio_stocks = portfolio['symbols'].tolist()
+print(portfolio_stocks)
+combine_stocks(portfolio_stocks)
