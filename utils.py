@@ -14,6 +14,7 @@ from pypfopt.expected_returns import mean_historical_return
 from pypfopt.risk_models import CovarianceShrinkage
 from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
+import time
 
 start = dt.datetime.now() - dt.timedelta(days=365)
 end = dt.datetime.now()
@@ -30,12 +31,12 @@ def get_companies_list():
     url_sap_100 = 'https://en.wikipedia.org/wiki/S%26P_100'
 
     while True:
-        print("Please choose which stock index you would like to pick stocks from.")
-        print("The larger the index, the longer it will take to analyse the stocks")
-        print("1: 'dow': 30 companies from the Dow Jones (fast analysis time ~ 1 min)")
-        print("2: 'sap100': 100 companies from the S&P100 (slow analysis time ~ 3 min)")
-        print("3: 'sap500': 500 companies from the S&P500 (slowest analysis time ~ 6 min)")
-        print("Example: 'dow' chooses the Dow Jones  (30) \n")
+        typewriter("Please choose which stock index you would like to pick stocks from.\n")
+        typewriter("The larger the index, the longer it will take to analyse the stocks\n")
+        typewriter("1: 'dow': 30 companies from the Dow Jones (fast analysis time ~ 1 min)\n")
+        typewriter("2: 'sap100': 100 companies from the S&P100 (slow analysis time ~ 3 min)\n")
+        typewriter("3: 'sap500': 500 companies from the S&P500 (slowest analysis time ~ 6 min)\n")
+        typewriter("Example: 'dow' chooses the Dow Jones  (30) \n")
 
         index_choice = input("Enter your index here: ")
 
@@ -101,58 +102,6 @@ def scrape_company_tickers(index):
         tabel = tables[1]
         symbols = tabel['Symbol']
     return symbols
-
-# Calculate Log Return
-
-
-def calculate_log_return(start_price, end_price):
-    return log(end_price / start_price)
-
-# Calculate Variance
-
-
-def calculate_variance(dataset):
-    numerator = 0
-    mean = sum(dataset)/len(dataset)
-
-    for number in dataset:
-        element = (number - mean)**2
-        numerator += element
-
-    variance = numerator / len(dataset)
-    return variance
-
-# Calculate Standard Deviation
-
-
-def calculate_stddev(dataset):
-    variance = calculate_variance(dataset)
-    stddev = sqrt(variance)
-    return stddev
-
-
-# Calculate Correlation Coefficient
-def calculate_correlation(set_x, set_y):
-    # Sum of all values in each dataset
-    sum_x = sum(set_x)
-    sum_y = sum(set_y)
-
-    # Sum of all squared values in each dataset
-    sum_x2 = sum([x ** 2 for x in set_x])
-    sum_y2 = sum([y ** 2 for y in set_y])
-
-    # Sum of the product of each respective element in each dataset
-    sum_xy = sum([x * y for x, y in zip(set_x, set_y)])
-
-    # Length of dataset
-    n = len(set_x)
-
-    # Calculate correlation coefficient
-    numerator = n * sum_xy - sum_x * sum_y
-    denominator = sqrt((n * sum_x2 - sum_x ** 2) * (n * sum_y2 - sum_y ** 2))
-
-    return numerator / denominator
-
 
 def calculate_percentile_rank(df):
     ranked_percentiles = df.apply(lambda x: [stats.percentileofscore(
@@ -225,12 +174,13 @@ def process_data(tickers):
 
 
 def collect_data(symbols):
-    print('calculating your company fundamentals - this may take a minute or two...')
+    typewriter('first we need to fetch the company financials for each stock...\n')
     stocks_list = []
     for ticker in symbols:
-        print(f"Fetching data for {ticker}")
+        print(f"Fetching financial data for {ticker}")
         stocks_list.append(yf.Ticker(ticker).info)
 
+    print('calculating your company fundamentals - this may take a minute or two...')
     # Create a list of fundamental information that we are interested in
     fundamentals = ['symbol', 'marketCap', 'forwardPE', 'priceToBook', 'forwardEps',
                     'debtToEquity', 'returnOnEquity', 'returnOnAssets', 'revenueGrowth', 'quickRatio', 'dividendYield']
@@ -361,7 +311,7 @@ def validate_number(portfolio_size, df):
 
 def pull_returns(ticker, start, end):
     try:
-        print(f"Fetching data for {ticker}")
+        print(f"Fetching pricing data for {ticker}")
         data = yf.download(ticker, start=start, end=end, progress=False)
         return data['Adj Close']
     except Exception as e:
@@ -373,7 +323,9 @@ def combine_stocks(tickers):
     data_frames = pd.DataFrame()
     for i in tickers:
         data_frames[i] = (pull_returns(i, start, end))
-
-    print(data_frames)
     return data_frames
 
+def typewriter(input_text, speed = 0.025):
+    for letter in input_text:
+        print(letter, end='', flush=True)
+        time.sleep(speed)
