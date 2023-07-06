@@ -5,6 +5,11 @@ import datetime as dt
 from datetime import datetime
 import yfinance as yf
 from yahoo_fin import stock_info as si
+from pypfopt.expected_returns import mean_historical_return
+from pypfopt.risk_models import CovarianceShrinkage
+from pypfopt.efficient_frontier import EfficientFrontier
+from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
+from pypfopt import HRPOpt
 from utils import *
 
 chosen_index = get_companies_list()
@@ -45,4 +50,32 @@ print(portfolio)
 
 portfolio_stocks = portfolio['symbols'].tolist()
 print(portfolio_stocks)
-combine_stocks(portfolio_stocks)
+portfolio_prices = combine_stocks(portfolio_stocks)
+
+#Mean Variance Optimization 
+# mu = mean_historical_return(portfolio_prices)
+# S = CovarianceShrinkage(portfolio_prices).ledoit_wolf()
+# ef = EfficientFrontier(mu, S)
+# weights = ef.max_sharpe()
+# cleaned_weights = ef.clean_weights()
+# print(dict(cleaned_weights))
+# ef.portfolio_performance(verbose=True)
+latest_prices = get_latest_prices(portfolio_prices)
+
+#Hierarchical Risk Parity (HRP)
+port_returns = portfolio_prices.pct_change().dropna()
+hrp = HRPOpt(port_returns)
+hrp_weights = hrp.optimize()
+weights = hrp.optimize()
+hrp.portfolio_performance(verbose=True)
+print(dict(hrp_weights))
+
+
+print('Please input how much you would like to invest in your portfolio:')
+print('There is a minimum limit of €100:')
+investment = input("Enter your investment number here: ")
+investment = int(investment)
+da = DiscreteAllocation(weights, latest_prices, total_portfolio_value=investment)
+allocation, leftover = da.greedy_portfolio()
+print("Discrete allocation:", allocation)
+print("Funds remaining: ${:.2f}".format(leftover))

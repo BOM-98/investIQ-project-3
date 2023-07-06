@@ -10,10 +10,13 @@ from datetime import datetime
 import yfinance as yf
 from yahoo_fin import stock_info as si
 import scipy.stats as stats
+from pypfopt.expected_returns import mean_historical_return
+from pypfopt.risk_models import CovarianceShrinkage
+from pypfopt.efficient_frontier import EfficientFrontier
+from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
 
 start = dt.datetime.now() - dt.timedelta(days=365)
 end = dt.datetime.now()
-
 
 def get_companies_list():
     """
@@ -373,3 +376,4 @@ def combine_stocks(tickers):
 
     print(data_frames)
     return data_frames
+
