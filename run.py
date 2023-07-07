@@ -18,20 +18,21 @@ def main():
     symbols = scrape_company_tickers(chosen_index)
     fundamentals_data = collect_data(symbols)
     fundamentals_data['quarterlyReturn'] = process_data(symbols)
-    print ('---------------------------------------------------- \n')
+    print ('----------------------------------------------------')
     typewriter('Here are the fundamentals for your list of companies: \n')
     print('----------------------------------------------------')
     print(fundamentals_data)
-    input("Press enter to rank your companies using our algorithm")
+    print('')
+    fundamentals_information()
     fundamentals_data_dropna = fundamentals_data.dropna()
     removed_companies = fundamentals_data['symbol'].count() - fundamentals_data_dropna['symbol'].count()
     fundamentals_percentile = calculate_percentile_rank(fundamentals_data_dropna[['forwardPE', 'debtToEquity','forwardEps', 'returnOnEquity', 'returnOnAssets', 'revenueGrowth', 'quickRatio', 'quarterlyReturn']])
     fundamentals_percentile['symbols'] = symbols
     fundamentals_percentile = fundamentals_percentile[['symbols','forwardPE','debtToEquity','forwardEps', 'returnOnEquity', 'returnOnAssets', 'revenueGrowth', 'quickRatio', 'quarterlyReturn']]
 
-    print ('---------------------------------------------------- \n')
+    typewriter('----------------------------------------------------\n')
     typewriter('Here are your companies scored and ranked based on their fundamentals \n - fundamentals are displayed here as percentiles: \n - our alogorithm calculates company scores based on fundamentals \n')
-    print('----------------------------------------------------')
+    typewriter('----------------------------------------------------\n')
 
     rank_stocks(fundamentals_percentile)
     fundamentals_percentile.sort_values('score', ascending = False, inplace = True)
@@ -64,8 +65,6 @@ def main():
     hrp_weights = hrp.optimize()
     weights = hrp.optimize()
     hrp.portfolio_performance(verbose=True)
-
-
     print('Please input how much you would like to invest in your portfolio:')
     print('There is a minimum limit of €100:')
     investment = input("Enter your investment number here: ")
@@ -75,14 +74,12 @@ def main():
     print("Discrete allocation:", allocation)
     print("Funds remaining: ${:.2f}".format(leftover))
     
+    
     while True: 
         print("Press Enter to start the game again.")
         if input() == '':
             main()
-
-typewriter("------------------------------------\n")
-typewriter('         Welcome to InvestIQ!       \n')
-typewriter("------------------------------------\n")
+            
 typewriter("""\
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⣤⣤⣤⡀⠀⠀⠀⠀⠀⠀⠀⡤⠚⣉⠉⠲⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⠶⠛⠉⠀⠀⢻⣿⣿⡀⠀⠀⠀⠀⠀⢸⠀⡞⠉⠙⠒⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
@@ -113,10 +110,13 @@ typewriter("""\
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⢸⢿⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠦⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n""", 0.0025)        
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠦⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n""", 0.0025)
+typewriter("------------------------------------\n")
+typewriter('         Welcome to InvestIQ!       \n')
+typewriter("------------------------------------\n")        
 typewriter("InvestIQ helps you create the best possible portfolio of stocks from US companies \n")
-typewriter("InvestIQ uses live data to create the best portfolio possible \n")
-typewriter("We do this in three steps\n")
+typewriter("InvestIQ uses live data to create your portfolio \n")
+typewriter("InvestIQ does this in four steps\n")
 typewriter("Step 1: choosing which group of companies to use in your portfolio\n")
 typewriter("Step 2: ranking those companies using our algorithm\n")
 typewriter("Step 3: creating the optimal portfolio from these companies to maxmize your returns and minimize risk\n")
@@ -127,6 +127,6 @@ typewriter("2: Portfolio Variance\n")
 typewriter("3: Sharpe Ratio\n")
 typewriter("Your goal is to get each of these scores as high as possible\n")
 while True:
-    typewriter("Press Enter to start the game.\n")
+    typewriter("Press Enter to start.\n")
     if input() == '':
         main()

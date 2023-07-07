@@ -37,13 +37,13 @@ def get_companies_list():
     typewriter("1: To select the 30 companies from the Dow Jones (fast analysis time ~ 1 min) enter 'dow'\n")
     typewriter("2: To select the 100 companies from the S&P100 (slow analysis time ~ 3 min) enter 'sap100': \n")
     typewriter("3: To select the 500 companies from the S&P500 (slowest analysis time ~ 6 min) enter 'sap500'\n")
-    typewriter("Example: 'dow' chooses the Dow Jones  (30) \n")
+    typewriter("Example: 'dow' chooses option 1 \n")
     
     while True:
         index_choice = input("Enter your index here: ")
 
         if validate_index(index_choice):
-            print("Data is valid")
+            print("Input is valid")
             break
 
     if index_choice == 'dow':
@@ -106,6 +106,9 @@ def scrape_company_tickers(index):
     return symbols
 
 def calculate_percentile_rank(df):
+    typewriter("------------------------------------\n")
+    typewriter('  Step 2: Ranking Your Companies       \n')
+    typewriter("------------------------------------\n")
     ranked_percentiles = df.apply(lambda x: [stats.percentileofscore(
         x, a, 'rank') if pd.notnull(a) else np.nan for a in x])
 
@@ -165,8 +168,6 @@ def calculate_quarterly_return(ticker, start, end):
         return np.nan
 
 # Step 2: Data Processing
-
-
 def process_data(tickers):
     index = 0
     returns_list = []
@@ -265,16 +266,14 @@ def choose_companies(df):
     """
     Get the number of companies the user wants to pull from the scored list.
     """
-
+    typewriter("-----------------------------------------------------------\n")
+    typewriter("Your companies are now ranked based on their fundamentals.\n")
+    typewriter("You can see the 'score' assigned to each one of them under the 'score' column in the table above\n")
+    typewriter("Please choose how many companies you would like to include from this list in your portfolio\n")
+    typewriter("Example: '10' chooses the top 10 companies from this list \n")
+    typewriter("-----------------------------------------------------------\n")
+    typewriter("You can choose a max of 50 companies in the case of the S&P 100 and 500 \n")
     while True:
-        print("-----------------------------------------------------------\n")
-        print("Your companies are now ranked based on their fundamentals.")
-        print("You can see the 'score' assigned to each one of them under the 'score' column in the table above")
-        print("Please choose how many companies you would like to include from this list in your portfolio")
-        print("Example: '10' chooses the top 10 companies from this list \n")
-        print("-----------------------------------------------------------\n")
-        print("You can choose a max of 50 companies in the case of the S&P 100 and 500 \n")
-
         portfolio_size = input("Enter your number here: ")
         portfolio_size = int(portfolio_size)
 
@@ -319,6 +318,125 @@ def combine_stocks(tickers):
     return data_frames
 
 def typewriter(input_text, speed = 0.025):
-    for letter in input_text:
-        print(letter, end='', flush=True)
-        time.sleep(speed)
+        for letter in input_text:
+            print(letter, end='', flush=True)
+            time.sleep(speed)
+        
+def fundamentals_information():
+    typewriter("This is a table of all your important company fundamentals\n")
+    typewriter("If you would like to learn more about any of the ratios in the column header, Simply type it in and press enter\n")
+    typewriter("Otherwise to continue to the next step and rank your companies press enter\n")
+    
+    while True: 
+        choice = input("Choose a heading or press Enter:")
+        if choice == '':
+            break
+        elif choice == 'marketCap':
+            typewriter("------------------------------------\n")
+            typewriter('       Market Capitalization        \n')
+            typewriter("------------------------------------\n")
+            print("""Market capitalization, commonly known as market cap refers to the overall value of a companys' shares of stock.
+This valuation is determined by multiplying the number of outstanding shares with the current market price per share.
+To illustrate suppose a company has 1 million outstanding shares and each share is currently priced at $50.
+In this scenario. The market cap of that company would amount to $50 million.
+Investors frequently rely on market cap as a tool to compare companies and make informed decisions regarding which stocks to purchase.
+Additionally market cap is utilized for categorizing companies into distinct sizes such as small cap, mid cap and large cap.\n""")
+        elif choice == 'forwardPE':
+            typewriter("------------------------------------\n")
+            typewriter('       Forward Price to Earnings    \n')
+            typewriter("------------------------------------\n")  
+            print("""The Forward Price-to-Earnings (Forward P/E) ratio is a way to measure how much investors are willing to pay for a company's future earnings.
+In the stock market, a company's Forward P/E ratio is calculated by dividing the current share price by the estimated earnings per share for the next 12 months.
+A lower Forward P/E ratio could mean that the stock is undervalued, or it could mean that analysts expect the company's earnings to grow.
+A higher Forward P/E ratio could mean the stock is overvalued, or it could mean that investors are willing to pay a premium because they expect strong earnings growth.
+Whether a Forward P/E ratio is 'good' or 'bad' can depend on whether the company's future earnings live up to expectations.\n""")
+        elif choice == 'priceToBook':
+            typewriter("------------------------------------\n")
+            typewriter('       Price to Book                \n')
+            typewriter("------------------------------------\n")
+            print("""The Price-to-Book (P/B) ratio is a financial metric used to assess the market's valuation of a company relative to its book value.\n
+The book value is essentially the company's net worth if it were to be liquidated, i.e., all its assets sold and all its debts paid off. It's calculated as the total value of the company's assets minus its liabilities.
+The "price" in the P/B ratio refers to the market value of the company, which is determined by the current price of the company's shares times the number of shares outstanding.
+The P/B ratio thus compares the market's valuation of the company (price) to its intrinsic value (book value). A P/B ratio less than 1 may indicate that the company's stock is undervalued, while a P/B ratio greater than 1 may suggest it's overvalued.
+However, these interpretations can vary depending on the industry and other factors.\n""")
+        elif choice == 'forwardEps':
+            typewriter("------------------------------------\n")
+            typewriter('       Forward EPS                  \n')
+            typewriter("------------------------------------\n")
+            print("""
+Forward Earnings Per Share (EPS) is a measure of a company's predicted profitability for the next financial period. 
+It's calculated by taking estimated earnings for a future period and dividing it by the number of outstanding shares of the company's stock. 
+
+This measure is used by investors to assess the company's future profitability and to help determine if the stock is overvalued or undervalued. 
+A higher Forward EPS suggests that the company is expected to be more profitable in the future, which could make the stock more attractive to investors. 
+However, it's important to remember that these are only estimates and actual results may vary.\n
+""")
+        elif choice == 'debtToEquity':
+            typewriter("------------------------------------\n")
+            typewriter('            Debt to Equity          \n')
+            typewriter("------------------------------------\n")
+            print("""
+The Debt to Equity ratio is a financial metric that provides a snapshot of a company's financial leverage. 
+It is calculated by dividing a company's total liabilities by its shareholder equity. 
+This ratio is used to evaluate a company's financial leverage and risk. A high Debt to Equity ratio often means that a company has been aggressive in financing its growth with debt, which can result in volatile earnings due to the additional interest expense. 
+On the other hand, a low Debt to Equity ratio might indicate that a company is not taking advantage of the increased profits that financial leverage may bring. 
+Investors often use this ratio to compare the capital structure of different companies.
+""")
+        elif choice == 'returnOnEquity':
+            typewriter("------------------------------------\n")
+            typewriter('            Return on Equity        \n')
+            typewriter("------------------------------------\n")
+            print("""
+Return on Equity (ROE) is a measure of financial performance that is calculated by dividing net income by shareholders' equity. 
+It is expressed as a percentage and indicates how well a company is generating income from the money shareholders have invested. 
+In other words, ROE tells you how good a company is at rewarding its shareholders for their investment. 
+A high ROE could mean that a company is effectively generating profits, but it's always important to compare a company's ROE with its industry average or other competing companies. 
+On the other hand, a low ROE might suggest that the company is not effectively using its resources to generate profits.
+""")
+        elif choice == 'returnOnAssets':
+            typewriter("------------------------------------\n")
+            typewriter('            Return on Assets        \n')
+            typewriter("------------------------------------\n")
+            print("""
+Return on Assets (ROA) is a financial ratio that shows the percentage of profit a company earns in relation to its overall resources. 
+It is calculated by dividing a company's annual earnings by its total assets and is displayed as a percentage. 
+In other words, ROA tells you how efficiently a company is converting the money it has to invest into net income. 
+A high ROA indicates that the company is earning more money on less investment, meaning it is operating efficiently and using its assets effectively to generate profits. 
+On the other hand, a low ROA may indicate that the company is investing a lot of money in assets, but it's not generating a lot of profit from these investments.\n
+""")
+        elif choice == 'revenueGrowth':
+            typewriter("------------------------------------\n")
+            typewriter('            Revenue Growth          \n')
+            typewriter("------------------------------------\n")
+            print("""
+Revenue Growth is a financial metric that is used to measure the rate at which a company's income, also known as sales revenue, is increasing. 
+This gives investors and other stakeholders an idea of how quickly the company is growing its sales revenue.\n
+""")
+        elif choice == 'quickRatio':
+            typewriter("------------------------------------\n")
+            typewriter('            Quick Ratio             \n')
+            typewriter("------------------------------------\n")
+            print("""
+Quick Ratio, also known as the acid-test ratio, is a liquidity ratio that measures a company's ability to pay off its current liabilities without relying on the sale of inventory. 
+It's calculated as (Current Assets - Inventory) / Current Liabilities. A higher quick ratio means a more liquid current position.\n
+""")
+        elif choice == 'dividendYield':
+            typewriter("------------------------------------\n")
+            typewriter('            Dividend Yield          \n')
+            typewriter("------------------------------------\n")
+            print("""
+Dividend Yield is a financial ratio that shows how much a company pays out in dividends each year relative to its stock price. 
+It's calculated as Annual Dividends per Share / Price per Share. It's often expressed as a percentage. 
+A higher dividend yield means the investor is getting a higher return on their investment.\n
+""")
+        elif choice == 'quarterlyReturn':
+            typewriter("------------------------------------\n")
+            typewriter('            Quarterly Return        \n')
+            typewriter("------------------------------------\n")
+            print("""
+Quarterly Return is a measure of an investment's change in value over a three-month period. 
+It's calculated as (End Value - Start Value) / Start Value. It's often expressed as a percentage. 
+A higher quarterly return means the investment has grown in value over the quarter.\n
+""")
+        else:
+            print("invalid input, try again:")
