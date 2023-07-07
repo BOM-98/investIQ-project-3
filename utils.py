@@ -17,12 +17,26 @@ from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
 from pypfopt import HRPOpt
 import time
 
+# The start and end date range for the stock data we will be analysing
 start = dt.datetime.now() - dt.timedelta(days=365)
 end = dt.datetime.now()
 
+
 def get_companies_list():
     """
-    Get the index from which stocks are to be picked from the user.
+    The function prompts the user to choose a stock index and receive the relevant Wikipedia URL.
+     
+    The function offers three options: Dow Jones, S&P 100 or S&P 500. 
+    The user needs to input their choice, which is later validated with the `validate_index` function. 
+    Once marked valid, the function returns the relevant URL of a Wikipedia page with information on the chosen index.
+    Args: 
+        None
+    
+    Returns:
+        str: The URL of the Wikipedia page that lists the companies in the chosen index.
+
+    Raises:
+        ValueError: If the user's input is not 'dow', 'sap100', or 'sap500'. 
     """
     # URL of the Wikipedia page from which to scrape the S&P 500 company list
     url_sap_500 = 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
@@ -33,13 +47,18 @@ def get_companies_list():
     typewriter("------------------------------------\n")
     typewriter('  Step 1: Choosing Your Index       \n')
     typewriter("------------------------------------\n")
-    typewriter("Please choose which stock index you would like to pick stocks from.\n")
-    typewriter("The larger the index, the longer it will take to analyse the stocks\n")
-    typewriter("1: To select the 30 companies from the Dow Jones (fast analysis time ~ 1 min) enter 'dow'\n")
-    typewriter("2: To select the 100 companies from the S&P100 (slow analysis time ~ 3 min) enter 'sap100': \n")
-    typewriter("3: To select the 500 companies from the S&P500 (slowest analysis time ~ 6 min) enter 'sap500'\n")
+    typewriter(
+        "Please choose which stock index you would like to pick stocks from.\n")
+    typewriter(
+        "The larger the index, the longer it will take to analyse the stocks\n")
+    typewriter(
+        "1: To select the 30 companies from the Dow Jones (fast analysis time ~ 1 min) enter 'dow'\n")
+    typewriter(
+        "2: To select the 100 companies from the S&P100 (slow analysis time ~ 3 min) enter 'sap100': \n")
+    typewriter(
+        "3: To select the 500 companies from the S&P500 (slowest analysis time ~ 6 min) enter 'sap500'\n")
     typewriter("Example: 'dow' chooses option 1 \n")
-    
+
     while True:
         index_choice = input("Enter your index here: ")
 
@@ -59,7 +78,20 @@ def get_companies_list():
 
 def validate_index(index_choice):
     """
-    Determines whether the use choice of index was valid
+    Validates the user's choice of stock index.
+
+    This function checks if the user's input matches: 'dow', 'sap100', or 'sap500'. 
+    If it doesn't, a ValueError is raised and the function returns False. 
+    If the input is valid, the function returns True.
+
+    Args:
+        index_choice (str): The user's input representing their choice of stock index.
+
+    Returns:
+        bool: True if the input is valid, False otherwise.
+
+    Raises:
+        ValueError: If the input is not 'dow', 'sap100', or 'sap500'.
     """
     try:
         if index_choice != 'dow' and index_choice != 'sap100' and index_choice != 'sap500':
@@ -75,10 +107,10 @@ def validate_index(index_choice):
 
 def scrape_company_tickers(index):
     """
-    Scrape the company tickers from the Wikipedia page of a given index.
+    Extract the company tickers from an index's Wikipedia page.
 
-    This function scrapes the company tickers from the Wikipedia page of the S&P 500, S&P 100, or Dow Jones Industrial Average index. 
-    It uses pandas to scrape the tables from the Wikipedia page and extracts the 'Symbol' column, which contains the ticker symbols.
+    This function copies the stock tickers from the S&P 500, S&P 100, or Dow Jones Industrial Average index pages on Wikipedia. 
+    It pulls the tables from the Wikipedia page using pandas and then extracts the ticker symbols from the 'Symbol' column.
 
     Parameters:
     index (str): The URL of the Wikipedia page of the index. It should be one of the following:
@@ -89,9 +121,6 @@ def scrape_company_tickers(index):
     Returns:
     symbols (Series): A pandas Series containing the ticker symbols of the companies in the index.
     """
-    # Use pandas to scrape the tables from the Wikipedia page
-    # The first table on the page is the one we want
-    # The ticker symbol is in the 'Symbol' column
     if index == 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies':
         tables = pd.read_html(index)
         tabel = tables[0]
@@ -106,78 +135,24 @@ def scrape_company_tickers(index):
         symbols = tabel['Symbol']
     return symbols
 
-def calculate_percentile_rank(df):
-    typewriter("------------------------------------\n")
-    typewriter('  Step 2: Ranking Your Companies       \n')
-    typewriter("------------------------------------\n")
-    ranked_percentiles = df.apply(lambda x: [stats.percentileofscore(
-        x, a, 'rank') if pd.notnull(a) else np.nan for a in x])
-
-    columns_to_inverse = ['forwardPE', 'debtToEquity']
-
-    for column in columns_to_inverse:
-        if column in ranked_percentiles:
-            ranked_percentiles[column] = 100 - ranked_percentiles[column]
-    ranked_percentiles = ranked_percentiles.round(2)
-    return ranked_percentiles
-
-
-# rank the stocks by percentiles
-def rank_stocks(df):
-    """
-    Using a variety of criteria, this function determines a score for each stock from the DataFrame passed as a parameter. 
-
-
-    The score is the sum of the products of each factor's weight and its respective weighting for each factor. 
-    Forward PE, Forward EPS, Debt to Equity, Return on Equity, Return on Assets, Revenue Growth, Quick Ratio, 
-    and Quarterly Return are the aspects taken into account.
-
-    Factor_weights = [['forwardPE', 0.1],['forwardEps', 0.1],['debtToEquity', 0.1],['returnOnEquity', 0.1],['returnOnAssets', 0.1],['revenueGrowth', 0.2], ['quickRatio', 0.1], ['quarterlyReturn', 0.2]]
-
-    Parameters:
-    df (pandas.DataFrame): A DataFrame containing the factors for each stock. The DataFrame 
-    should have the factors as columns and each row represents a stock.
-
-    Returns:
-    pandas.DataFrame: The input DataFrame with an additional column 'score' that contains the 
-    calculated score for each stock.
-
-    Example:
-    >>> df =            forwardPE  debtToEquity  forwardEps  returnOnEquity  returnOnAssets  revenueGrowth  quickRatio  quarterlyReturn
-    symbols                                                                                                                 
-    MMM                    81.82         36.36       50.00           77.27           40.91          13.64       40.91            13.64
-    AXP                    50.00         22.73       77.27           63.64           18.18          90.91       86.36            72.73
-    AMGN                   68.18         -0.00       90.91          100.00           59.09          31.82      100.00             9.09
-    ... })
-    >>> rank_stocks(df)
-    """
-
-    # step 2: multiply each factor percentile by its weighting to get a score
-    df['score'] = df['forwardPE'] * 0.1 + df['forwardEps'] * 0.1 + df['debtToEquity'] * 0.1 + df['returnOnEquity'] * \
-        0.1 + df['returnOnAssets']*0.1 + df['revenueGrowth'] * 0.2 + \
-        df['quickRatio'] * 0.1 + df['quarterlyReturn'] * 0.2
-
-
-def calculate_quarterly_return(ticker, start, end):
-    try:
-        data = yf.download(ticker, start=start, end=end, progress=False)
-        data['quarterly_return'] = data['Adj Close'].resample(
-            'Q').ffill().pct_change()
-        return data.loc['2023-06-30', 'quarterly_return']
-    except Exception as e:
-        print(f"Failed to download data for {ticker}. Error: {e}")
-        return np.nan
-
-# Step 2: Data Processing
-def process_data(tickers):
-    index = 0
-    returns_list = []
-    for ticker in tickers:
-        returns_list.append(calculate_quarterly_return(ticker, start, end))
-    return returns_list
-
 
 def collect_data(symbols):
+    """ 
+    Retrieves and processes financial data for a set of stock symbols.
+    
+    The yfinance library is used by this function to loop through a list of stock symbols and retrieve financial data for each one. 
+    After retrieving the data, it creates a DataFrame from it and selects a subset of it that corresponds to a preset list of important financial metrics. 
+    The resultant DataFrame is given back.
+    
+    Args: 
+        symbols (list): A list of strings representing the stock symbols for which data is to be retrieved.
+    
+    Returns:
+        pandas.DataFrame: A DataFrame containing the selected financial data for each stock symbol. 
+        The DataFrame's columns correspond to the selected financial metrics, and its rows correspond to the stock symbols.
+    Raises:
+        KeyError: If the fetched data does not contain one of the chosen financial measures. 
+    """
     typewriter('first we need to fetch the company financials for each stock...\n')
     stocks_list = []
     for ticker in symbols:
@@ -195,144 +170,70 @@ def collect_data(symbols):
     return fundamentals_data
 
 
-def return_portfolios(expected_returns, cov_matrix):
-    np.random.seed(1)
-    port_returns = []
-    port_volatility = []
-    stock_weights = []
-
-    selected = (expected_returns.axes)[0]
-
-    num_assets = len(selected)
-    num_portfolios = 5000
-
-    for single_portfolio in range(num_portfolios):
-        weights = np.random.random(num_assets)
-        weights /= np.sum(weights)
-        returns = np.dot(weights, expected_returns)
-        volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
-        port_returns.append(returns)
-        port_volatility.append(volatility)
-        stock_weights.append(weights)
-
-        portfolio = {'Returns': port_returns,
-                     'Volatility': port_volatility}
-
-    for counter, symbol in enumerate(selected):
-        portfolio[symbol + ' Weight'] = [Weight[counter]
-                                         for Weight in stock_weights]
-
-    df = pd.DataFrame(portfolio)
-
-    column_order = ['Returns', 'Volatility'] + \
-        [stock+' Weight' for stock in selected]
-
-    df = df[column_order]
-
-    return df
-
-
-def optimal_portfolio(returns):
-    n = returns.shape[1]
-    returns = np.transpose(returns.as_matrix())
-
-    N = 100
-    mus = [10**(5.0 * t/N - 1.0) for t in range(N)]
-
-    # Convert to cvxopt matrices
-    S = opt.matrix(np.cov(returns))
-    pbar = opt.matrix(np.mean(returns, axis=1))
-
-    # Create constraint matrices
-    G = -opt.matrix(np.eye(n))   # negative n x n identity matrix
-    h = opt.matrix(0.0, (n, 1))
-    A = opt.matrix(1.0, (1, n))
-    b = opt.matrix(1.0)
-
-    # Calculate efficient frontier weights using quadratic programming
-    portfolios = [solvers.qp(mu*S, -pbar, G, h, A, b)['x']
-                  for mu in mus]
-    # CALCULATE RISKS AND RETURNS FOR FRONTIER
-    returns = [blas.dot(pbar, x) for x in portfolios]
-    risks = [np.sqrt(blas.dot(x, S*x)) for x in portfolios]
-    # CALCULATE THE 2ND DEGREE POLYNOMIAL OF THE FRONTIER CURVE
-    m1 = np.polyfit(returns, risks, 2)
-    x1 = np.sqrt(m1[2] / m1[0])
-    # CALCULATE THE OPTIMAL PORTFOLIO
-    wt = solvers.qp(opt.matrix(x1 * S), -pbar, G, h, A, b)['x']
-    return np.asarray(wt), returns, risks
-
-
-def choose_companies(df):
+def process_data(tickers, start = start, end = end):
     """
-    Get the number of companies the user wants to pull from the scored list.
+    Processes a list of stock tickers by calculating their quarterly returns.
+
+    This function uses the 'calculate_quarterly_return' function to iteratively calculate the quarterly return for each stock ticker in a list of tickers. 
+    The calculation's beginning and ending dates are specified in the file. 
+    Lists of the calculated returns are returned by the function.
+
+    Args:
+        tickers (list): A list of strings representing the stock tickers to process.
+
+    Returns:
+        list: A list of floats representing the calculated quarterly returns for each stock ticker.
+
+    Raises:
+        NameError: If `start` or `end` are not defined elsewhere in the code.
+        Any exceptions raised by `calculate_quarterly_return`.
     """
-    typewriter("-----------------------------------------------------------\n")
-    typewriter("Your companies are now ranked based on their fundamentals in the table above.\n")
-    typewriter("You can see the 'score' assigned to each one of them under the 'score' column \n")
-    typewriter("Please choose how many companies you would like to include from this list in your portfolio\n")
-    typewriter("Example: '10' chooses the top 10 companies from this list \n")
-    typewriter("-----------------------------------------------------------\n")
-    typewriter("You cannot choose more than the number of companies listed or 50 companies in the case of the S&P 100 and 500 \n")
-    while True:
-        portfolio_size = input("Enter your number here: ")
-        portfolio_size = int(portfolio_size)
+    returns_list = []
+    for ticker in tickers:
+        returns_list.append(calculate_quarterly_return(ticker, start, end))
+    return returns_list
 
-        if validate_number(portfolio_size, df):
-            print("Data is valid")
-            break
 
-    portfolio_df = df.head(portfolio_size)
+def calculate_quarterly_return(ticker, start, end):
+    """
+    Determines the quarterly return for a specific stock ticker over a given time period.
     
-    typewriter("You have chosen your portfolio\n")
-    typewriter("The InvestIQ algorithm will now determine the allocation that will get the highest returns with the lowest risk\n")
+    Using the yfinance package, this function downloads historical data for a specified stock ticker, resamples the data to a quarterly frequency, and then computes the percentage change in the adjusted closing price. 
+    The function outputs the last quarterly return.
+    
+    Args:
+        ticker (str): A string representing the stock ticker to fetch data for.
+        start (str): A string representing the start date for the data fetch in 'YYYY-MM-DD' format.
+        end (str): A string representing the end date for the data fetch in 'YYYY-MM-DD' format.
 
-    return portfolio_df
+    Returns:
+        float: The quarterly return for the quarter ending on '2023-06-30', or np.nan if the data fetch fails.
 
-
-def validate_number(portfolio_size, df):
-    """
-    Determines whether the choice of companies was valid
+    Raises:
+        Exception: If the data fetch fails for any reason.
     """
     try:
-        if int(portfolio_size) > 50 or int(portfolio_size) > df['symbols'].count():
-            raise ValueError(
-                f"You have not chosen a valid portfolio size"
-            )
-    except ValueError as e:
-        print(f"Invalid data: {e}, please try again.\n")
-        return False
-
-    return True
-
-def pull_returns(ticker, start, end):
-    try:
-        print(f"Fetching pricing data for {ticker}")
         data = yf.download(ticker, start=start, end=end, progress=False)
-        return data['Adj Close']
+        data['quarterly_return'] = data['Adj Close'].resample(
+            'Q').ffill().pct_change()
+        return data.loc['2023-06-30', 'quarterly_return']
     except Exception as e:
-        print(f"Failed to download data for {ticker}. Error: {e}")
+        print(f"Failed to download data for {ticker}. Error: {e} - continuing with remaining tickers.")
         return np.nan
 
 
-def combine_stocks(tickers):
-    typewriter("------------------------------------\n")
-    typewriter(' Step 3: Optimizing Your Portfolio  \n')
-    typewriter("------------------------------------\n")
-    typewriter('InvestIQ needs to fetch the historical prices of your porfolio companies. \n')
-    typewriter('This is used to calculate expected returns and your variance: \n')
-    data_frames = pd.DataFrame()
-    for i in tickers:
-        data_frames[i] = (pull_returns(i, start, end))
-    typewriter('Portfolio weights have been caluclated \n')
-    return data_frames
-
-def typewriter(input_text, speed = 0.001):
-        for letter in input_text:
-            print(letter, end='', flush=True)
-            time.sleep(speed)
-        
 def fundamentals_information():
+    """
+    Information on several financial fundamentals is provided.
+    
+    The user can find out additional information about any of the ratios listed in the column header using this function, which shows a table of significant company basics. 
+    The user can press enter to move on to the next phase and rank the businesses or enter the name of a ratio to read more about it.
+    Market Capitalization, Forward Price to Earnings, Price to Book, Forward EPS, Debt to Equity, Return on Equity, Return on Assets, Revenue Growth, Quick Ratio, Dividend Yield, and Quarterly Return are among the financial fundamentals covered by the function.
+    The function use a while loop to repeatedly elicit input from the user up until the user presses enter, at which point the function is terminated.
+
+    Raises:
+        Exception: If the user enters an invalid input, the function prints an error message and asks for input again.
+    """
     typewriter("This is a table of all your important company fundamentals\n")
     typewriter("If you would like to learn more about any of the ratios in the column header, enter in the name\n")
     typewriter("Otherwise to continue to the next step and rank your companies press enter\n")
@@ -450,8 +351,222 @@ A higher quarterly return means the investment has grown in value over the quart
 """)
         else:
             print("invalid input, try again:")
+
+
+def calculate_percentile_rank(df):
+    """
+    Calculates the percentile rank for each value in the DataFrame.
+    
+    Determines each value's percentile rating for the DataFrame.
+    Each value in the DataFrame is subjected to this function's application of the percentileofscore function from the scipy.stats module. 
+    The percentage of values in the DataFrame that are less than or equal to a certain value is known as the percentile rank of that value. 
+    The function then reverses the percentile ranks for the columns "forwardPE" and "debtToEquity," where a lower value is preferred. With the values replaced by their percentile ranks, the function produces a DataFrame with the same shape as the input DataFrame.
+
+    Args:
+        df (pd.DataFrame): A DataFrame containing the values for which to calculate percentile ranks.
+
+    Returns:
+        pd.DataFrame: A DataFrame of the same shape as the input DataFrame, but with the values replaced by their percentile ranks.
+
+    """
+    typewriter("------------------------------------\n")
+    typewriter('  Step 2: Ranking Your Companies       \n')
+    typewriter("------------------------------------\n")
+    ranked_percentiles = df.apply(lambda x: [stats.percentileofscore(
+        x, a, 'rank') if pd.notnull(a) else np.nan for a in x])
+    columns_to_inverse = ['forwardPE', 'debtToEquity']
+
+    for column in columns_to_inverse:
+        if column in ranked_percentiles:
+            ranked_percentiles[column] = 100 - ranked_percentiles[column]
+    ranked_percentiles = ranked_percentiles.round(2)
+    return ranked_percentiles
+
+
+# rank the stocks by percentiles
+def rank_stocks(df):
+    """
+    This function calculates a score for each stock from the DataFrame supplied.  
+
+    The score is the sum of the products of each factor's weight and its respective weighting for each factor. 
+    Aspects considered include Forward PE, Forward EPS, Debt to Equity, Return on Equity, Return on Assets, Revenue Growth, Quick Ratio, and Quarterly Return.
+
+    Factor_weights = [['forwardPE', 0.1],['forwardEps', 0.1],['debtToEquity', 0.1],['returnOnEquity', 0.1],['returnOnAssets', 0.1],['revenueGrowth', 0.2], ['quickRatio', 0.1], ['quarterlyReturn', 0.2]]
+
+    Parameters:
+    df (pandas.DataFrame): A DataFrame containing the factors for each stock. The DataFrame 
+    should have the factors as columns and each row represents a stock.
+
+    Returns:
+    pandas.DataFrame: The input DataFrame with an additional column 'score' that contains the 
+    calculated score for each stock.
+
+    Example:
+    >>> df =            forwardPE  debtToEquity  forwardEps  returnOnEquity  returnOnAssets  revenueGrowth  quickRatio  quarterlyReturn
+    symbols                                                                                                                 
+    MMM                    81.82         36.36       50.00           77.27           40.91          13.64       40.91            13.64
+    AXP                    50.00         22.73       77.27           63.64           18.18          90.91       86.36            72.73
+    AMGN                   68.18         -0.00       90.91          100.00           59.09          31.82      100.00             9.09
+    ... })
+    >>> rank_stocks(df)
+    """
+    df['score'] = df['forwardPE'] * 0.1 + df['forwardEps'] * 0.1 + df['debtToEquity'] * 0.1 + df['returnOnEquity'] * \
+        0.1 + df['returnOnAssets'] * 0.1 + df['revenueGrowth'] * 0.2 + \
+        df['quickRatio'] * 0.1 + df['quarterlyReturn'] * 0.2
+
+
+def choose_companies(df):
+    """
+    Prompts the user to select the number of companies to include in the portfolio from the ranked list.
+    
+    The user and this function communicate to decide how many top-ranked businesses the user wants to put in their portfolio.
+    A number is requested from the user, which is then checked to see if it falls within the permitted range. 
+    Up until a valid input is obtained, the function keeps asking the user for input.
+
+    Args:
+        df (pd.DataFrame): A DataFrame containing the ranked list of companies.
+
+    Returns:
+        None. This function is used for its side effect of interacting with the user and does not return a value.
+    """
+    typewriter("-----------------------------------------------------------\n")
+    typewriter("Your companies are now ranked based on their fundamentals in the table above.\n")
+    typewriter("You can see the 'score' assigned to each one of them under the 'score' column \n")
+    typewriter("Please choose how many companies you would like to include from this list in your portfolio\n")
+    typewriter("Example: '10' chooses the top 10 companies from this list \n")
+    typewriter("-----------------------------------------------------------\n")
+    typewriter("You cannot choose more than the number of companies listed or 100 companies as the absolute max \n")
+    while True:
+        portfolio_size = input("Enter your number here: ")
+        portfolio_size = int(portfolio_size)
+
+        if validate_number(portfolio_size, df):
+            print("Data is valid")
+            break
+
+    portfolio_df = df.head(portfolio_size)
+    
+    typewriter("You have chosen your portfolio\n")
+    typewriter("The InvestIQ algorithm will now determine the allocation that will get the highest returns with the lowest risk\n")
+
+    return portfolio_df
+
+
+def validate_number(portfolio_size, df):
+    """
+    Validates the number of companies chosen by the user for the portfolio.
+
+    This function determines whether the user-selected input number of firms falls within the permitted range. 
+    The function returns False and a ValueError is raised if the input integer is outside of the permitted range. 
+    The function returns True if the provided number falls inside the permitted range.
+
+    Args:
+        portfolio_size (int): The number of companies chosen by the user for the portfolio.
+        df (pd.DataFrame): A DataFrame containing the ranked list of companies.
+
+    Returns:
+        bool: True if the input number is within the acceptable range, False otherwise.
+    """
+    try:
+        if int(portfolio_size) > 100 or int(portfolio_size) > df['symbols'].count():
+            raise ValueError(
+                f"You have not chosen a valid portfolio size"
+            )
+    except ValueError as e:
+        print(f"Invalid data: {e}, please try again.\n")
+        return False
+
+    return True
+
+
+def pull_returns(ticker, start, end):
+    """
+    Retrieves, for a given ticker symbol and time frame, the historical adjusted close prices.
+    
+    This function downloads historical pricing information for a particular ticker symbol using the yfinance library. 
+    The obtained data is then used to extract the "Adj Close" prices.  
+    If the data download fails for any reason, the function handles the exception and returns NaN.
+
+    Args:
+        ticker (str): The ticker symbol of the company for which to fetch the historical pricing data.
+        start (str): The start date of the date range for which to fetch the data, in the format 'YYYY-MM-DD'.
+        end (str): The end date of the date range for which to fetch the data, in the format 'YYYY-MM-DD'.
+
+    Returns:
+        pd.Series: A pandas Series containing the historical adjusted close prices for the given ticker symbol, 
+                   indexed by date. If the data download fails, returns NaN.
+    """
+    try:
+        print(f"Fetching pricing data for {ticker}")
+        data = yf.download(ticker, start=start, end=end, progress=False)
+        return data['Adj Close']
+    except Exception as e:
+        print(f"Failed to download data for {ticker}. Error: {e} - continuing with remaining tickers.")
+        return np.nan
+
+
+def combine_stocks(tickers):
+    """
+    Fetches the historical prices for a list of ticker symbols and combines them into a single DataFrame.
+
+    This function iterates over a list of ticker symbols, fetches the historical prices for each symbol using the 
+    pull_returns function, and combines these price series into a single DataFrame. The DataFrame is then returned 
+    for further processing. This data is used to calculate expected returns and variance for portfolio optimization.
+
+    Args:
+        tickers (list): A list of ticker symbols for which to fetch the historical prices.
+
+    Returns:
+        pd.DataFrame: A DataFrame where each column represents the historical prices for a ticker symbol, 
+                      and the column name is the ticker symbol. The DataFrame's index is the date.
+    """
+    typewriter("------------------------------------\n")
+    typewriter(' Step 3: Optimizing Your Portfolio  \n')
+    typewriter("------------------------------------\n")
+    typewriter('InvestIQ needs to fetch the historical prices of your porfolio companies. \n')
+    typewriter('This is used to calculate expected returns and your variance: \n')
+    data_frames = pd.DataFrame()
+    for i in tickers:
+        data_frames[i] = (pull_returns(i, start, end))
+    typewriter('Portfolio weights have been caluclated \n')
+    return data_frames
+
+
+def typewriter(input_text, speed = 0.001):
+    """
+    Prints out the input text at a specified speed to simulate the effect of a typewriter.
+
+    This function iterates over each character in the input text and prints it out with a delay between each character. 
+    The delay is specified by the speed parameter. The effect is that the text appears to be typed out in real time, 
+    similar to a typewriter.
+
+    Args:
+        input_text (str): The text to be printed out.
+        speed (float, optional): The delay between each character in seconds. Default is 0.001 seconds.
+
+    Returns:
+        None
+    """
+    for letter in input_text:
+        print(letter, end='', flush=True)
+        time.sleep(speed)
+
             
 def hpp_optimization(portfolio_prices, latest_prices):
+    """
+    Using Hierarchical Risk Parity (HRP), a portfolio is optimised, and the number of shares to buy for each stock is determined.
+
+    The HRP optimisation approach is used in this function to determine the ideal weights for each stock in the portfolio after first calculating the portfolio returns.
+    The user is then prompted to enter the total sum they intend to put into the portfolio.
+    It determines the remaining funds and the number of shares to buy for each stock using the DiscreteAllocation function from the PyPortfolioOpt package.
+
+    Args:
+        portfolio_prices (pd.DataFrame): A DataFrame containing the historical prices for each stock in the portfolio.
+        latest_prices (pd.Series): A Series containing the latest prices for each stock in the portfolio.
+
+    Returns:
+        None
+    """
     port_returns = portfolio_prices.pct_change().dropna()
     hrp = HRPOpt(port_returns)
     hrp_weights = hrp.optimize()
@@ -473,8 +588,20 @@ def hpp_optimization(portfolio_prices, latest_prices):
     typewriter("--------------------------------------\n")
     hrp.portfolio_performance(verbose=True)
     typewriter("--------------------------------------\n")
+
         
 def reset_program():
+    """
+    Resets the program and provides the user with options to learn about various financial terms.
+
+    This function runs in a loop, prompting the user to either start the InvestIQ program again or learn about various financial terms such as 'Expected Annual Return', 'Annual Volatility', and 'Sharpe Ratio'. The user can choose to learn about these terms by entering the corresponding number (1, 2, or 3) or press Enter to restart the program. The loop continues until a valid input is provided.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     while True: 
         answer = input("Press Enter to start InvestIQ again, or type 1 to learn about expected annual return, 2 to learn about annual volatility and 3 to learn about the sharpe ratio!.")
         if answer == '':
