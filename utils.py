@@ -14,6 +14,7 @@ from pypfopt.expected_returns import mean_historical_return
 from pypfopt.risk_models import CovarianceShrinkage
 from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
+from pypfopt import HRPOpt
 import time
 
 start = dt.datetime.now() - dt.timedelta(days=365)
@@ -183,7 +184,7 @@ def collect_data(symbols):
         print(f"Fetching financial data for {ticker}")
         stocks_list.append(yf.Ticker(ticker).info)
 
-    typewriter('calculating your company fundamentals - this may take a minute or two...\n')
+    typewriter('InvestIQ is calculating your company fundamentals - this may take a minute or two...\n')
     # Create a list of fundamental information that we are interested in
     fundamentals = ['symbol', 'marketCap', 'forwardPE', 'priceToBook', 'forwardEps',
                     'debtToEquity', 'returnOnEquity', 'returnOnAssets', 'revenueGrowth', 'quickRatio', 'dividendYield']
@@ -267,12 +268,12 @@ def choose_companies(df):
     Get the number of companies the user wants to pull from the scored list.
     """
     typewriter("-----------------------------------------------------------\n")
-    typewriter("Your companies are now ranked based on their fundamentals.\n")
-    typewriter("You can see the 'score' assigned to each one of them under the 'score' column in the table above\n")
+    typewriter("Your companies are now ranked based on their fundamentals in the table above.\n")
+    typewriter("You can see the 'score' assigned to each one of them under the 'score' column \n")
     typewriter("Please choose how many companies you would like to include from this list in your portfolio\n")
     typewriter("Example: '10' chooses the top 10 companies from this list \n")
     typewriter("-----------------------------------------------------------\n")
-    typewriter("You can choose a max of 50 companies in the case of the S&P 100 and 500 \n")
+    typewriter("You cannot choose more than the number of companies listed or 50 companies in the case of the S&P 100 and 500 \n")
     while True:
         portfolio_size = input("Enter your number here: ")
         portfolio_size = int(portfolio_size)
@@ -282,6 +283,9 @@ def choose_companies(df):
             break
 
     portfolio_df = df.head(portfolio_size)
+    
+    typewriter("You have chosen your portfolio\n")
+    typewriter("The InvestIQ algorithm will now determine the allocation that will get the highest returns with the lowest risk\n")
 
     return portfolio_df
 
@@ -312,19 +316,25 @@ def pull_returns(ticker, start, end):
 
 
 def combine_stocks(tickers):
+    typewriter("------------------------------------\n")
+    typewriter(' Step 3: Optimizing Your Portfolio  \n')
+    typewriter("------------------------------------\n")
+    typewriter('InvestIQ needs to fetch the historical prices of your porfolio companies. \n')
+    typewriter('This is used to calculate expected returns and your variance: \n')
     data_frames = pd.DataFrame()
     for i in tickers:
         data_frames[i] = (pull_returns(i, start, end))
+    typewriter('Portfolio weights have been caluclated \n')
     return data_frames
 
-def typewriter(input_text, speed = 0.025):
+def typewriter(input_text, speed = 0.001):
         for letter in input_text:
             print(letter, end='', flush=True)
             time.sleep(speed)
         
 def fundamentals_information():
     typewriter("This is a table of all your important company fundamentals\n")
-    typewriter("If you would like to learn more about any of the ratios in the column header, Simply type it in and press enter\n")
+    typewriter("If you would like to learn more about any of the ratios in the column header, enter in the name\n")
     typewriter("Otherwise to continue to the next step and rank your companies press enter\n")
     
     while True: 
@@ -440,3 +450,66 @@ A higher quarterly return means the investment has grown in value over the quart
 """)
         else:
             print("invalid input, try again:")
+            
+def hpp_optimization(portfolio_prices, latest_prices):
+    port_returns = portfolio_prices.pct_change().dropna()
+    hrp = HRPOpt(port_returns)
+    hrp_weights = hrp.optimize()
+    weights = hrp.optimize()
+    typewriter("-----------------------------------------\n")
+    typewriter(' Step 4: Calculating Shares To Purchase  \n')
+    typewriter("-----------------------------------------\n")
+    typewriter('Please input how much you would like to invest in your portfolio:\n')
+    typewriter('There is a minimum limit of €500:\n')
+    while True:
+        investment = input("Enter your investment number here: ")
+        investment = int(investment)
+        if investment > 499:
+            break
+    da = DiscreteAllocation(weights, latest_prices, total_portfolio_value=investment)
+    allocation, leftover = da.greedy_portfolio()
+    print("Your recommended allocation of shares 'stock':'number of shares'\n", allocation)
+    print("Funds remaining: ${:.2f}".format(leftover))
+    typewriter("--------------------------------------\n")
+    hrp.portfolio_performance(verbose=True)
+    typewriter("--------------------------------------\n")
+        
+def reset_program():
+    while True: 
+        answer = input("Press Enter to start InvestIQ again, or type 1 to learn about expected annual return, 2 to learn about annual volatility and 3 to learn about the sharpe ratio!.")
+        if answer == '':
+            break
+        elif answer == '1':
+            typewriter("------------------------------------\n")
+            typewriter('      Expected Annual Return        \n')
+            typewriter("------------------------------------\n")
+            print("""
+Expected Annual Return is a projection of the potential earnings or profit from an investment over a one year period. 
+It's calculated based on historical data and future predictions. It's often expressed as a percentage. 
+A higher expected annual return means the investment is predicted to yield a higher return over the course of a year. 
+However, it's important to remember that these are just estimates and actual returns may vary.
+""")
+        elif answer == '2':
+            typewriter("------------------------------------\n")
+            typewriter('        Annual Volatility           \n')
+            typewriter("------------------------------------\n")
+            print("""
+Annual Volatility is a statistical measure of the dispersion of returns for a given security or market index over a one year period. 
+It is commonly associated with the risk level of the investment. 
+High volatility means that the price of the security can change dramatically over a short time period in either direction, which can be seen as more risky.
+On the other hand, low volatility would mean that a security's value does not fluctuate dramatically, but changes in value at a steady pace over a period of time.
+""")
+        elif answer == '3':
+            typewriter("------------------------------------\n")
+            typewriter('            Sharpe Ratio              \n')
+            typewriter("------------------------------------\n")
+            print("""
+The Sharpe Ratio is a measure used by investors to understand the return of an investment compared to its risk. 
+It is the average return earned in excess of the risk-free rate per unit of volatility or total risk. 
+The greater a portfolio's Sharpe ratio, the better its risk-adjusted performance. 
+If the Sharpe ratio is negative, it means the risk-free rate is greater than the portfolio's return, or the portfolio's return is expected to be negative. 
+In this case, a riskless investment would perform better.
+Generally a Sharpe ratio above 1 is considered good, while a sharpe ratio above 1.5 is considered excellent
+""")
+        else:
+            print("invalid input, try again")
