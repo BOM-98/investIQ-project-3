@@ -22,6 +22,7 @@ def main():
     typewriter('Here are the fundamentals for your list of companies: \n')
     print('----------------------------------------------------')
     print(fundamentals_data)
+    input("Press enter to rank your companies using our algorithm")
     fundamentals_data_dropna = fundamentals_data.dropna()
     removed_companies = fundamentals_data['symbol'].count() - fundamentals_data_dropna['symbol'].count()
     fundamentals_percentile = calculate_percentile_rank(fundamentals_data_dropna[['forwardPE', 'debtToEquity','forwardEps', 'returnOnEquity', 'returnOnAssets', 'revenueGrowth', 'quickRatio', 'quarterlyReturn']])
@@ -112,7 +113,19 @@ typewriter("""\
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⢸⢿⣿⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
-⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠦⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n""", 0.01)        
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠻⠦⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀\n""", 0.0025)        
+typewriter("InvestIQ helps you create the best possible portfolio of stocks from US companies \n")
+typewriter("InvestIQ uses live data to create the best portfolio possible \n")
+typewriter("We do this in three steps\n")
+typewriter("Step 1: choosing which group of companies to use in your portfolio\n")
+typewriter("Step 2: ranking those companies using our algorithm\n")
+typewriter("Step 3: creating the optimal portfolio from these companies to maxmize your returns and minimize risk\n")
+typewriter("Step 4: determining how many shares to buy in each company based on your budget\n")
+typewriter("At the end of the program, you will be given three metrics\n")
+typewriter("1: Expected Return\n")
+typewriter("2: Portfolio Variance\n")
+typewriter("3: Sharpe Ratio\n")
+typewriter("Your goal is to get each of these scores as high as possible\n")
 while True:
     typewriter("Press Enter to start the game.\n")
     if input() == '':

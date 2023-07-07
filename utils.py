@@ -29,15 +29,17 @@ def get_companies_list():
     url_dow = 'https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average'
     # URL of the Wikipedia page from which to scrape the S&P 100 company list
     url_sap_100 = 'https://en.wikipedia.org/wiki/S%26P_100'
-
+    typewriter("------------------------------------\n")
+    typewriter('  Step 1: Choosing Your Index       \n')
+    typewriter("------------------------------------\n")
+    typewriter("Please choose which stock index you would like to pick stocks from.\n")
+    typewriter("The larger the index, the longer it will take to analyse the stocks\n")
+    typewriter("1: To select the 30 companies from the Dow Jones (fast analysis time ~ 1 min) enter 'dow'\n")
+    typewriter("2: To select the 100 companies from the S&P100 (slow analysis time ~ 3 min) enter 'sap100': \n")
+    typewriter("3: To select the 500 companies from the S&P500 (slowest analysis time ~ 6 min) enter 'sap500'\n")
+    typewriter("Example: 'dow' chooses the Dow Jones  (30) \n")
+    
     while True:
-        typewriter("Please choose which stock index you would like to pick stocks from.\n")
-        typewriter("The larger the index, the longer it will take to analyse the stocks\n")
-        typewriter("1: 'dow': 30 companies from the Dow Jones (fast analysis time ~ 1 min)\n")
-        typewriter("2: 'sap100': 100 companies from the S&P100 (slow analysis time ~ 3 min)\n")
-        typewriter("3: 'sap500': 500 companies from the S&P500 (slowest analysis time ~ 6 min)\n")
-        typewriter("Example: 'dow' chooses the Dow Jones  (30) \n")
-
         index_choice = input("Enter your index here: ")
 
         if validate_index(index_choice):
@@ -180,7 +182,7 @@ def collect_data(symbols):
         print(f"Fetching financial data for {ticker}")
         stocks_list.append(yf.Ticker(ticker).info)
 
-    print('calculating your company fundamentals - this may take a minute or two...')
+    typewriter('calculating your company fundamentals - this may take a minute or two...\n')
     # Create a list of fundamental information that we are interested in
     fundamentals = ['symbol', 'marketCap', 'forwardPE', 'priceToBook', 'forwardEps',
                     'debtToEquity', 'returnOnEquity', 'returnOnAssets', 'revenueGrowth', 'quickRatio', 'dividendYield']
@@ -299,15 +301,6 @@ def validate_number(portfolio_size, df):
         return False
 
     return True
-
-# def get_stock(ticker):
-#     print(f"Fetching data for {ticker}")
-#     data = web.DataReader(f"{ticker}","yahoo",start,end)
-#     data[f'{ticker}'] = data["Close"]
-#     data = data[[f'{ticker}']]
-#     print(data.head())
-#     return data
-
 
 def pull_returns(ticker, start, end):
     try:
