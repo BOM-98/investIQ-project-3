@@ -24,16 +24,18 @@ end = dt.datetime.now()
 
 def get_companies_list():
     """
-    The function prompts the user to choose a stock index and receive the relevant Wikipedia URL.
-     
-    The function offers three options: Dow Jones, S&P 100 or S&P 500. 
-    The user needs to input their choice, which is later validated with the `validate_index` function. 
-    Once marked valid, the function returns the relevant URL of a Wikipedia page with information on the chosen index.
+    The function prompts the user to choose a stock index and receive the relevant
+    Wikipedia URL. The function offers three options: Dow Jones, S&P 100 or S&P 500.
+    The user needs to input their choice, which is later validated with the
+    `validate_index` function. Once marked valid, the function returns the relevant
+    URL of a Wikipedia page with information on the chosen index.
+
     Args: 
         None
-    
+
     Returns:
-        str: The URL of the Wikipedia page that lists the companies in the chosen index.
+        str: The URL of the Wikipedia page that lists the companies in the chosen
+        index.
 
     Raises:
         ValueError: If the user's input is not 'dow', 'sap100', or 'sap500'. 
@@ -170,7 +172,7 @@ def collect_data(symbols):
     return fundamentals_data
 
 
-def process_data(tickers, start = start, end = end):
+def process_data(tickers, start=start, end=end):
     """
     Processes a list of stock tickers by calculating their quarterly returns.
 
@@ -532,7 +534,7 @@ def combine_stocks(tickers):
     return data_frames
 
 
-def typewriter(input_text, speed = 0.0001):
+def typewriter(input_text, speed=0.0001):
     """
     Prints out the input text at a specified speed to simulate the effect of a typewriter.
 
@@ -640,3 +642,4 @@ Generally a Sharpe ratio above 1 is considered good, while a sharpe ratio above 
 """)
         else:
             print("invalid input, try again")
+            
