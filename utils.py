@@ -435,7 +435,7 @@ def choose_companies(df):
     typewriter("Please choose how many companies you would like to include from this list in your portfolio\n")
     typewriter("Example: '10' chooses the top 10 companies from this list \n")
     typewriter("-----------------------------------------------------------\n")
-    typewriter("You cannot choose more than the number of companies listed or 100 companies as the absolute max \n")
+    typewriter("You must choose between 3 and 100 and the number cannot be greater than the total number of companies listed in the table \n")
     while True:
         portfolio_size = input("Enter your number here: ")
         portfolio_size = int(portfolio_size)
@@ -468,7 +468,7 @@ def validate_number(portfolio_size, df):
         bool: True if the input number is within the acceptable range, False otherwise.
     """
     try:
-        if int(portfolio_size) > 100 or int(portfolio_size) > df['symbols'].count():
+        if int(portfolio_size) > 100 or int(portfolio_size) > df['symbols'].count() or int(portfolio_size) < 3:
             raise ValueError(
                 f"You have not chosen a valid portfolio size"
             )
