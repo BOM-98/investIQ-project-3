@@ -115,5 +115,5 @@ typewriter("3: Sharpe Ratio\n")
 typewriter("Your goal is to get 1 & 3 as high as possible and 2 as low as possible\n")
 while True:
     typewriter("Press Enter to start.\n")
-    if input() == '':
+    if input('\n') == '':
         main()

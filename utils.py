@@ -60,7 +60,7 @@ def get_companies_list():
     typewriter("Example: 'dow' chooses option 1 \n")
 
     while True:
-        index_choice = input("Enter your index here: ")
+        index_choice = input("Enter your index here:\n")
 
         if validate_index(index_choice):
             print("Input is valid")
@@ -239,7 +239,7 @@ def fundamentals_information():
     typewriter("Otherwise to continue to the next step and rank your companies press enter\n")
     
     while True: 
-        choice = input("Choose a heading or press Enter:")
+        choice = input("Choose a heading or press Enter:\n")
         if choice == '':
             break
         elif choice == 'marketCap':
@@ -532,7 +532,7 @@ def combine_stocks(tickers):
     return data_frames
 
 
-def typewriter(input_text, speed = 0.001):
+def typewriter(input_text, speed = 0.0001):
     """
     Prints out the input text at a specified speed to simulate the effect of a typewriter.
 
@@ -577,7 +577,7 @@ def hpp_optimization(portfolio_prices, latest_prices):
     typewriter('Please input how much you would like to invest in your portfolio:\n')
     typewriter('There is a minimum limit of €500:\n')
     while True:
-        investment = input("Enter your investment number here: ")
+        investment = input("Enter your investment number here:\n")
         investment = int(investment)
         if investment > 499:
             break
@@ -603,7 +603,7 @@ def reset_program():
         None
     """
     while True: 
-        answer = input("Press Enter to start InvestIQ again, or type 1 to learn about expected annual return, 2 to learn about annual volatility and 3 to learn about the sharpe ratio!.")
+        answer = input("Press Enter to start InvestIQ again, or type 1 to learn about expected annual return, 2 to learn about annual volatility and 3 to learn about the sharpe ratio!.\n")
         if answer == '':
             break
         elif answer == '1':
