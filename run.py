@@ -158,28 +158,28 @@ typewriter("         Welcome to InvestIQ!       \n")
 typewriter("------------------------------------\n")
 typewriter(
     "InvestIQ helps you create the best possible\
-        portfolio of stocks from US companies \n"
+ portfolio of stocks from US companies \n"
 )
 typewriter("InvestIQ uses live data to\
-    create your portfolio \n")
+ create your portfolio \n")
 typewriter("InvestIQ does this in four steps\n")
 typewriter("Step 1: choosing which group of\
-    companies to use in your portfolio\n")
+ companies to use in your portfolio\n")
 typewriter("Step 2: ranking those companies using our algorithm\n")
 typewriter(
     "Step 3: creating the optimal portfolio from\
-        these companies to maxmize your returns and minimize risk\n"
+ these companies to maxmize your returns and minimize risk\n"
 )
 typewriter(
     "Step 4: determining how many shares to buy\
-        in each company based on your budget\n"
+ in each company based on your budget\n"
 )
 typewriter("At the end of the program, you will be given three metrics\n")
 typewriter("1: Expected Annual Return\n")
 typewriter("2: Annual Volatility\n")
 typewriter("3: Sharpe Ratio\n")
 typewriter("Your goal is to get 1 & 3 as high\
-    as possible and 2 as low as possible\n")
+ as possible and 2 as low as possible\n")
 while True:
     typewriter("Press Enter to start.\n")
     if input("\n") == "":
