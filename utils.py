@@ -696,6 +696,7 @@ def validate_number(portfolio_size, df):
             int(portfolio_size) > 100
             or int(portfolio_size) > df["symbols"].count()
             or int(portfolio_size) < 3
+            or typeof(portfolio_size) != int
         ):
             raise ValueError(f"You have not chosen a valid portfolio size")
     except ValueError as e:
@@ -782,7 +783,7 @@ def combine_stocks(tickers):
     return data_frames
 
 
-def typewriter(input_text, speed=0.001):
+def typewriter(input_text, speed=0.025):
     """
     Prints out the input text at a specified speed to
     simulate the effect of a typewriter.
