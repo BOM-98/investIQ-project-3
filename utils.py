@@ -57,20 +57,20 @@ def get_companies_list():
     typewriter("  Step 1: Choosing Your Index       \n")
     typewriter("------------------------------------\n")
     typewriter("Please choose which stock index you would\
-        like to pick stocks from.\n")
+ like to pick stocks from.\n")
     typewriter("The larger the index, the longer it \
-        will take to analyse the stocks\n")
+ will take to analyse the stocks\n")
     typewriter(
         "1: To select the 30 companies from the Dow Jones\
-            (fast analysis time ~ 1 min) enter 'dow'\n"
+ (fast analysis time ~ 1 min) enter 'dow'\n"
     )
     typewriter(
         "2: To select the 100 companies from the S&P100\
-            (slow analysis time ~ 3 min) enter 'sap100': \n"
+ (slow analysis time ~ 3 min) enter 'sap100': \n"
     )
     typewriter(
         "3: To select the 500 companies from the S&P500\
-            (slowest analysis time ~ 6 min) enter 'sap500'\n"
+ (slowest analysis time ~ 6 min) enter 'sap500'\n"
     )
     typewriter("Example: 'dow' chooses option 1 \n")
 
@@ -120,7 +120,7 @@ def validate_index(index_choice):
         ):
             raise ValueError(
                 f"You have not chosen a valid option: choose\
-                    either 'dow', 'sap100', or 'sap500' "
+ either 'dow', 'sap100', or 'sap500' "
             )
     except ValueError as e:
         print(f"Invalid data: {e}, please try again.\n")
@@ -193,7 +193,7 @@ def collect_data(symbols):
         one of the chosen financial measures.
     """
     typewriter("first we need to fetch the company financials\
-    for each stock...\n")
+ for each stock...\n")
     stocks_list = []
     for ticker in symbols:
         print(f"Fetching financial data for {ticker}")
@@ -201,7 +201,7 @@ def collect_data(symbols):
 
     typewriter(
         "InvestIQ is calculating your company fundamentals - this\
-        may take a minute or two...\n"
+ may take a minute or two...\n"
     )
     # Create a list of fundamental information that
     # we are interested in
@@ -321,11 +321,11 @@ def fundamentals_information():
     typewriter("This is a table of all your important company fundamentals\n")
     typewriter(
         "If you would like to learn more about any of the ratios in the\
-        column header, enter in the name\n"
+ column header, enter in the name\n"
     )
     typewriter(
         "Otherwise to continue to the next step and rank your companies\
-        press enter\n"
+ press enter\n"
     )
 
     while True:
@@ -338,7 +338,7 @@ def fundamentals_information():
             typewriter("------------------------------------\n")
             print(
                 """Market capitalization, commonly known as market cap
-                refers to the overall value of a companys' shares of stock.
+refers to the overall value of a companys' shares of stock.
 This valuation is determined by multiplying the number of outstanding
 shares with the current market price per share.
 To illustrate suppose a company has 1 million outstanding shares
@@ -355,8 +355,8 @@ distinct sizes such as small cap, mid cap and large cap.\n"""
             typewriter("------------------------------------\n")
             print(
                 """The Forward Price-to-Earnings (Forward P/E) ratio is
-                a way to measure how much investors are willing to pay
-                for a company's future earnings.
+a way to measure how much investors are willing to pay
+for a company's future earnings.
 In the stock market, a company's Forward P/E ratio is calculated
 by dividing the current share price by the estimated earnings
 per share for the next 12 months.
@@ -631,24 +631,24 @@ def choose_companies(df):
     typewriter("-----------------------------------------------------------\n")
     typewriter(
         "Your companies are now ranked based on their\
-    fundamentals in the table above.\n"
+ fundamentals in the table above.\n"
     )
     typewriter(
         "You can see the 'score' assigned to each one\
-    of them under the 'score' column \n"
+ of them under the 'score' column \n"
     )
     typewriter(
         "Please choose how many companies you would like\
-    to include from this list in your portfolio\n"
+ to include from this list in your portfolio\n"
     )
     typewriter("Example: '10' chooses the top 10 companies\
-    from this list \n")
+ from this list \n")
     typewriter("-------------------------------------------\
-    ----------------\n")
+----------------\n")
     typewriter(
         "You must choose between 3 and 100 and the number cannot\
-    be greater than the total number of companies listed\
-    in the table \n"
+ be greater than the total number of companies listed\
+ in the table \n"
     )
     while True:
         portfolio_size = input("Enter your number here: ")
@@ -663,7 +663,7 @@ def choose_companies(df):
     typewriter("You have chosen your portfolio\n")
     typewriter(
         "The InvestIQ algorithm will now determine the allocation\
-    that will get the highest returns with the lowest risk\n"
+ that will get the highest returns with the lowest risk\n"
     )
 
     return portfolio_df
@@ -739,7 +739,7 @@ def pull_returns(ticker, start, end):
     except Exception as e:
         print(
             f"Failed to download data for {ticker}. Error:\
-        {e} - continuing with remaining tickers."
+ {e} - continuing with remaining tickers."
         )
         return np.nan
 
@@ -837,7 +837,7 @@ def hpp_optimization(portfolio_prices, latest_prices):
     typewriter(" Step 4: Calculating Shares To Purchase  \n")
     typewriter("-----------------------------------------\n")
     typewriter("Please input how much you would like to invest\
-    in your portfolio:\n")
+ in your portfolio:\n")
     typewriter("There is a minimum limit of €500:\n")
     while True:
         investment = input("Enter your investment number here:\n")
@@ -850,7 +850,7 @@ def hpp_optimization(portfolio_prices, latest_prices):
     allocation, leftover = da.greedy_portfolio()
     print(
         "Your recommended allocation of shares\
-    'stock':'number of shares'\n", allocation
+ 'stock':'number of shares'\n", allocation
     )
     print("Funds remaining: ${:.2f}".format(leftover))
     typewriter("--------------------------------------\n")
@@ -880,8 +880,8 @@ def reset_program():
     while True:
         answer = input(
             "Press Enter to start InvestIQ again, or type 1 to learn about\
-            expected annual return, 2 to learn about annual volatility\
-            and 3 to learn about the sharpe ratio!.\n"
+ expected annual return, 2 to learn about annual volatility\
+ and 3 to learn about the sharpe ratio!.\n"
         )
         if answer == "":
             break
@@ -892,14 +892,14 @@ def reset_program():
             print(
                 """
 Expected Annual Return is a projection\
-    of the potential earnings or profit\
-    from an investment over a one year period.
+ of the potential earnings or profit\
+ from an investment over a one year period.
 It's calculated based on historical data and future predictions.\
-    It's often expressed as a percentage.
+ It's often expressed as a percentage.
 A higher expected annual return means the investment is predicted\
-    to yield a higher return over the course of a year.
+ to yield a higher return over the course of a year.
 However, it's important to remember that these are just estimates\
-    and actual returns may vary.
+ and actual returns may vary.
 """
             )
         elif answer == "2":
@@ -909,14 +909,14 @@ However, it's important to remember that these are just estimates\
             print(
                 """
 Annual Volatility is a statistical measure of the dispersion of returns\
-    for a given security or market index over a one year period.
+ for a given security or market index over a one year period.
 It is commonly associated with the risk level of the investment.
 High volatility means that the price of the security can change\
-    dramatically over a short time period in either direction,\
-        which can be seen as more risky.
+ dramatically over a short time period in either direction,\
+ which can be seen as more risky.
 On the other hand, low volatility would mean that a security's value\
-    does not fluctuate dramatically, but changes in value at a steady\
-        pace over a period of time.
+ does not fluctuate dramatically, but changes in value at a steady\
+ pace over a period of time.
 """
             )
         elif answer == "3":
@@ -926,17 +926,17 @@ On the other hand, low volatility would mean that a security's value\
             print(
                 """
 The Sharpe Ratio is a measure used by investors to understand the\
-    return of an investment compared to its risk.
+ return of an investment compared to its risk.
 It is the average return earned in excess of the risk-free rate per\
-    unit of volatility or total risk.
+ unit of volatility or total risk.
 The greater a portfolio's Sharpe ratio, the better its risk-adjusted\
-    performance.
+ performance.
 If the Sharpe ratio is negative, it means the risk-free rate is greater
-    than the portfolio's return, or the portfolio's return is expected\
-        to be negative.
+ than the portfolio's return, or the portfolio's return is expected\
+ to be negative.
 In this case, a riskless investment would perform better.
 Generally a Sharpe ratio above 1 is considered good, while a sharpe\
-    ratio above 1.5 is considered excellent
+ ratio above 1.5 is considered excellent
 """
             )
         else:
