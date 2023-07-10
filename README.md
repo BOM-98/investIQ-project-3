@@ -1,8 +1,16 @@
-![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
+#InvestIQ
 
-Welcome,
+## Table of Contents
 
-This is the Code Institute student template for deploying your third portfolio project, the Python command-line project. The last update to this file was: **March 14, 2023**
+## Project Background
+
+InvestIQ is a Python command line application built to assist users in creating an optimal stock portfolio from US publically listed companies. Programs exist to help people optimize their stock portfolio in order to maximize their sharpe ratio - i.e. their return relative to their risk. However, these programs presuppose that users already know which stocks they should consider. Only after the user has added their stocks do the programs work to optimize how much should be allocated towards each stock. Some programs exist to help people assess which stocks to consider using tecnhical analysis - examining past pricing data. However these are separate from the programs that optimize the portfolios. There is a gap in helping people to choose which companies to include in your porfolio by using fundamental analysis - analysis using company financial reports instead of past pricing data. There is a further gap to combine this approach with portfolio optimization to make sure the user picks the best stocks and then optimizes them in the one place.
+
+Invest IQ uses an algorithm to rank stocks from either the Dow Jones, S&P100 or S&P500 using fundamental analysis, and create an optimized portfolio from those stocks to give users the highest return for a given level of risk. By harnessing the capabilities of Python, InvestIQ can analyse up to 500 companies and perform thousands of calculations within a matter of minutes to provide users with their stock portfolios - significantly decreasing the amount of time and effort required on their part.
+
+Users can select which stock index they want to analyze stocks from - rank those stocks based on their fundamental ratios, choose how many stocks they want to include in their portfolio and automatically optimize their investment allocation towards each stock to get the highest expected returns for the lowest level of risk using Hierarchical Risk Parity Optimization(HRP).
+
+InvestIQ makes creating your stock portfolio effortless.
 
 ## Reminders
 
@@ -30,6 +38,8 @@ Pandas was installed by running pip3 install pandas in the terminal and insertin
 Pandas Datareader was installed by running pip3 install pandas-datareader in the terminal and inserting import pandas_datareader.data as web in the run.py file.
 yfinance was installed by running pip3 install yfinance in the terminal and inserting import yfinance as yf in the run.py file. 
 Check yfinance dependencies. 
+PyPortfolioOpt was installed using pip install PyPortfolioOpt
+scikit-learn was installed using pip install scikit-learn
 
 ## Constraints
 
@@ -53,6 +63,14 @@ The deployment terminal is set to 80 columns by 24 rows. That means that each li
 Information on how to gather stock information using yfinance was gathered from [Algovibes](https://www.youtube.com/watch?v=ZUQEd22oNek) Youtube video.
 
 Inspiration on how to rank stocks was taken from [B/O Trading Blog's Article](https://medium.com/@chris_42047/a-weighted-ranking-system-for-stocks-python-tutorial-6af425ff65a4) where an example approach to scoring and applying weights to stocks was taken. 
+
+Portfolio optimization methods were taken from [Sadrach Pierre's Artile](https://builtin.com/data-science/portfolio-optimization-python) on how to Optimize a stock portfolio using Python. 
+
+Monopoly art from [emojicombos.com](https://emojicombos.com/monopoly-ascii-art).
+
+Chat gpt generated the descriptions for each fundamental financial metric in the program
+
+[Python Style Guide](https://peps.python.org/pep-0008/#comments) was used for determining how to style my comments
 ---
 
 Happy coding!
