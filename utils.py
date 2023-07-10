@@ -652,12 +652,12 @@ def choose_companies(df):
     )
     while True:
         portfolio_size = input("Enter your number here: ")
-        portfolio_size = int(portfolio_size)
 
         if validate_number(portfolio_size, df):
             print("Data is valid")
             break
-
+    
+    portfolio_size = int(portfolio_size)        
     portfolio_df = df.head(portfolio_size)
 
     typewriter("You have chosen your portfolio\n")
@@ -692,15 +692,19 @@ def validate_number(portfolio_size, df):
         acceptable range, False otherwise.
     """
     try:
-        if (
-            int(portfolio_size) > 100
-            or int(portfolio_size) > df["symbols"].count()
-            or int(portfolio_size) < 3
-            or typeof(portfolio_size) != int
-        ):
-            raise ValueError(f"You have not chosen a valid portfolio size")
-    except ValueError as e:
-        print(f"Invalid data: {e}, please try again.\n")
+        portfolio_size = int(portfolio_size)
+    except ValueError:
+        print("Invalid data: portfolio size is not a number,\
+ please try again.\n")
+        return False
+    
+    if (
+        portfolio_size > 100
+        or portfolio_size > df["symbols"].count()
+        or portfolio_size < 3
+    ):
+        print("You have not chosen a valid portfolio size,\
+ please try again.\n")
         return False
 
     return True
@@ -772,10 +776,10 @@ def combine_stocks(tickers):
     typewriter("------------------------------------\n")
     typewriter(
         "InvestIQ needs to fetch the historical prices\
-    of your porfolio companies. \n"
+ of your porfolio companies. \n"
     )
     typewriter("This is used to calculate expected returns\
-    and your variance: \n")
+ and your variance: \n")
     data_frames = pd.DataFrame()
     for i in tickers:
         data_frames[i] = pull_returns(i, start, end)
@@ -783,7 +787,7 @@ def combine_stocks(tickers):
     return data_frames
 
 
-def typewriter(input_text, speed=0.025):
+def typewriter(input_text, speed=0.00025):
     """
     Prints out the input text at a specified speed to
     simulate the effect of a typewriter.
