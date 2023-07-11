@@ -14,6 +14,13 @@ from utils import *
 
 
 def main():
+    """
+    Main function that runs the program
+    
+    This function handles the high-level logic of the program. 
+    It calls the functions that are responsible for the following:
+    
+    """
     # Step 1: Choosing Index
     # Function to pick index
     chosen_index = get_companies_list()
@@ -163,7 +170,7 @@ typewriter(
 typewriter("InvestIQ uses live data to\
  create your portfolio \n")
 typewriter("InvestIQ does this in four steps\n")
-typewriter("Step 1: choosing which group of\
+typewriter("Step 1: retrieving the group of\
  companies to use in your portfolio\n")
 typewriter("Step 2: ranking those companies using our algorithm\n")
 typewriter(
@@ -184,3 +191,6 @@ while True:
     typewriter("Press Enter to start.\n")
     if input("\n") == "":
         main()
+    else:
+        print("invalid input")
+        print("Press Enter on a blank line")

@@ -27,14 +27,12 @@ index_choice = ""
 
 def get_companies_list():
     """
-    The function prompts the user to choose a stock
-    index and receive the relevant Wikipedia URL.
-    The function offers three options: Dow Jones,
-    S&P 100 or S&P 500.The user needs to input their
+    The function prompts the user to continue analysing
+    the dow jones stock index .The user needs to input their
     choice, which is later validated with the
     `validate_index` function. Once marked valid,
     the function returns the relevant URL of a
-    Wikipedia page with information on the chosen index.
+    Wikipedia page with information on the Dow Jones index.
 
     Args:
         None
@@ -44,52 +42,31 @@ def get_companies_list():
         the companies in the chosen index.
 
     Raises:
-        ValueError: If the user's input is not 'dow',
-        'sap100', or 'sap500'.
+        ValueError: If the user's input is not 'y' or 'Y
     """
-    # URL of the Wikipedia page from which to scrape
-    # the S&P 500 company list
-    url_sap_500 = "https://en.wikipedia.org/wiki/List_of_S%26P_500_companies"
+  
     # URL of the Wikipedia page from which to scrape
     # the Dow Jones company list
     url_dow = "https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average"
-    # URL of the Wikipedia page from which to scrape
-    # the S&P 100 company list
-    url_sap_100 = "https://en.wikipedia.org/wiki/S%26P_100"
+
     typewriter("------------------------------------\n")
-    typewriter("  Step 1: Choosing Your Index       \n")
+    typewriter("  Step 1: Constructing Your Index   \n")
     typewriter("------------------------------------\n")
-    typewriter("Please choose which stock index you would\
- like to pick stocks from.\n")
-    typewriter("The larger the index, the longer it \
- will take to analyse the stocks\n")
-    typewriter(
-        "1: To select the 30 companies from the Dow Jones\
- (fast analysis time ~ 1 min) enter 'dow'\n"
-    )
-    typewriter(
-        "2: To select the 100 companies from the S&P100\
- (slow analysis time ~ 3 min) enter 'sap100': \n"
-    )
-    typewriter(
-        "3: To select the 500 companies from the S&P500\
- (slowest analysis time ~ 6 min) enter 'sap500'\n"
-    )
-    typewriter("Example: 'dow' chooses option 1 \n")
+    typewriter("The program will gather your stocks.\n")
+    typewriter("The stocks are from the Dow Jones Industrial \
+ Average (30 stocks)\n")
 
     while True:
-        index_choice = input("Enter your index here:\n")
+        index_choice = input("Enter 'y' or 'Y to continue:\n")
 
         if validate_index(index_choice):
             print("Input is valid")
             break
 
-    if index_choice == "dow":
+    if index_choice == "y":
         tickers_source = url_dow
-    elif index_choice == "sap100":
-        tickers_source = url_sap_100
-    elif index_choice == "sap500":
-        tickers_source = url_sap_500
+    elif index_choice == "Y":
+        tickers_source = url_dow
 
     return tickers_source
 
@@ -99,7 +76,7 @@ def validate_index(index_choice):
     Validates the user's choice of stock index.
 
     This function checks if the user's input matches:
-    'dow', 'sap100', or 'sap500'. If it doesn't, a
+    'Y' or 'y''. If it doesn't, a
     ValueError is raised and the function returns
     False. If the input is valid, the function returns True.
 
@@ -112,18 +89,17 @@ def validate_index(index_choice):
         otherwise.
 
     Raises:
-        ValueError: If the input is not 'dow',
-        'sap100', or 'sap500'.
+        ValueError: If the input is not '1',
+         or '2'.
     """
     try:
         if (
-            index_choice != "dow"
-            and index_choice != "sap100"
-            and index_choice != "sap500"
+            index_choice != "y"
+            and index_choice != "Y"
         ):
             raise ValueError(
                 f"You have not chosen a valid option: choose\
- either 'dow', 'sap100', or 'sap500' "
+ either 'y', or 'Y'"
             )
     except ValueError as e:
         print(f"Invalid data: {e}, please try again.\n")
@@ -136,18 +112,13 @@ def scrape_company_tickers(index):
     """
     Extract the company tickers from an index's Wikipedia page.
 
-    This function copies the stock tickers from the S&P 500,
-    S&P 100, or Dow Jones Industrial Average index pages on Wikipedia.
+    This function copies the stock tickers from the Dow Jones Industrial 
+    Average index pages on Wikipedia.
     It pulls the tables from the Wikipedia page using
     pandas and then extracts the ticker symbols from the 'Symbol' column.
 
     Parameters:
     index (str): The URL of the Wikipedia page of the index.
-    It should be one of the following:
-        - 'https://en.wikipedia.org/wiki/List_of_S%26P_500_companies'
-        for the S&P 500 index
-        - 'https://en.wikipedia.org/wiki/S%26P_100' for
-        the S&P 100 index
         - 'https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average'
         for the Dow Jones Industrial Average index
 
@@ -172,7 +143,7 @@ def scrape_company_tickers(index):
 
 def collect_data(symbols):
     """
-    Retrieves and processes financial data for a set of stock symbols.
+    Retrieves and processes financial data for the Dow Jones.
 
     The yfinance library is used by this function to loop through a
     list of stock symbols and retrieve financial data for each one.
@@ -196,72 +167,67 @@ def collect_data(symbols):
         one of the chosen financial measures.
     """
     
-    # fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
-    # symbols = fundamentals_data["symbol"]
-    # return fundamentals_data, symbols
-
-    typewriter("first we need to fetch the company financials\
- for each stock...\n")
-    stocks_list = []
-    for ticker in symbols:
-        try:
-            print(f"Fetching financial data for {ticker}")
-            stocks_list.append(yf.Ticker(ticker).info)
-            time.sleep(1)  # Add a delay of 1 second between each request
-        except Exception as err:
-            print(f"HTTP error occurred: {err}")
-            print("Yahoo Finance has limited the number of requests")
-            print("We need to stop the companies fetching process here")
-            print("Instead we will use our pre-fetched data")
-            if index_choice == "dow":
-                fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
-                symbols = fundamentals_data["symbol"]
-                return fundamentals_data, symbols
-                
-            elif index_choice == "sap100":
-                fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
-                symbols = fundamentals_data["symbol"]
-                return fundamentals_data, symbols
-            elif index_choice == "sap500":
-                fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
-                symbols = fundamentals_data["symbol"]
-                return fundamentals_data, symbols
-            break
-        
-    typewriter(
-        "InvestIQ is calculating your company fundamentals - this\
- may take a minute or two...\n"
-    )
-    # Create a list of fundamental information that
-    # we are interested in
-    fundamentals = [
-        "symbol",
-        "marketCap",
-        "forwardPE",
-        "priceToBook",
-        "forwardEps",
-        "debtToEquity",
-        "returnOnEquity",
-        "returnOnAssets",
-        "revenueGrowth",
-        "quickRatio",
-        "dividendYield",
-    ]
-    # Create a DataFrame from the info dictionary
-    stock_data = pd.DataFrame(stocks_list)
-    # # Select only the columns in the fundamentals list
-    fundamentals_data = stock_data[fundamentals]
-    
-    # Save the DataFrame to a CSV file
-    if index_choice == "dow":
-        return fundamentals_data, symbols
-    elif index_choice == "sap100":
-        fundamentals_data.to_csv('fundamentals_data_sap100.csv', index=False)
-        return fundamentals_data, symbols
-    elif index_choice == "sap500":
-        fundamentals_data.to_csv('fundamentals_data_sap500.csv', index=False)
-        return fundamentals_data, symbols
+    fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
+    symbols = fundamentals_data["symbol"]
     return fundamentals_data, symbols
+
+#     typewriter("first we need to fetch the company financials\
+#  for each stock...\n")
+#     stocks_list = []
+#     for ticker in symbols:
+#         try:
+#             print(f"Fetching financial data for {ticker}")
+#             stocks_list.append(yf.Ticker(ticker).info)
+#             time.sleep(1)  # Add a delay of 1 second between each request
+#         except Exception as err:
+#             print(f"HTTP error occurred: {err}")
+#             print("Yahoo Finance has limited the number of requests")
+#             print("We need to stop the companies fetching process here")
+#             print("We must revert to our dow-jones data")
+#             if index_choice == "dow":
+#                 fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
+#                 symbols = fundamentals_data["symbol"]
+#                 return fundamentals_data, symbols               
+#             elif index_choice == "sap100":
+#                 fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
+#                 symbols = fundamentals_data["symbol"]
+#                 return fundamentals_data, symbols
+#             break
+        
+#     typewriter(
+#         "InvestIQ is calculating your company fundamentals - this\
+#  may take a minute or two...\n"
+#     )
+#     # Create a list of fundamental information that
+#     # we are interested in
+#     fundamentals = [
+#         "symbol",
+#         "marketCap",
+#         "forwardPE",
+#         "priceToBook",
+#         "forwardEps",
+#         "debtToEquity",
+#         "returnOnEquity",
+#         "returnOnAssets",
+#         "revenueGrowth",
+#         "quickRatio",
+#         "dividendYield",
+#     ]
+#     # Create a DataFrame from the info dictionary
+#     stock_data = pd.DataFrame(stocks_list)
+#     # # Select only the columns in the fundamentals list
+#     fundamentals_data = stock_data[fundamentals]
+    
+#     # Save the DataFrame to a CSV file
+#     if index_choice == "dow":
+#         return fundamentals_data, symbols
+#     elif index_choice == "sap100":
+#         fundamentals_data.to_csv('fundamentals_data_sap100.csv', index=False)
+#         return fundamentals_data, symbols
+#     elif index_choice == "sap500":
+#         fundamentals_data.to_csv('fundamentals_data_sap500.csv', index=False)
+#         return fundamentals_data, symbols
+#     return fundamentals_data, symbols
 
 
 def process_data(tickers, start=start, end=end):
@@ -360,18 +326,30 @@ def fundamentals_information():
     typewriter("This is a table of all your important company fundamentals\n")
     typewriter(
         "If you would like to learn more about any of the ratios in the\
- column header, enter in the name\n"
+ column header, enter in:\n"
     )
+    print("1 for marketCap")
+    print("2 for forwardPE")
+    print("3 for priceToBook")
+    print("4 for forwardEps")
+    print("5 for debtToEquity")
+    print("6 for returnOnEquity")
+    print("7 for returnOnAssets")
+    print("8 for revenueGrowth")
+    print("9 for quickRatio")
+    print("10 for dividendYield")
+    print("11 for quarterlyReturn")
+    
     typewriter(
         "Otherwise to continue to the next step and rank your companies\
  press enter\n"
     )
 
     while True:
-        choice = input("Choose a heading or press Enter:\n")
+        choice = input("Choose a number or press Enter:\n")
         if choice == "":
             break
-        elif choice == "marketCap":
+        elif choice == "1":
             typewriter("------------------------------------\n")
             typewriter("       Market Capitalization        \n")
             typewriter("------------------------------------\n")
@@ -388,7 +366,7 @@ make informed decisions regarding which stocks to purchase.
 Additionally market cap is utilized for categorizing companies into
 distinct sizes such as small cap, mid cap and large cap.\n"""
             )
-        elif choice == "forwardPE":
+        elif choice == "2":
             typewriter("------------------------------------\n")
             typewriter("       Forward Price to Earnings    \n")
             typewriter("------------------------------------\n")
@@ -407,7 +385,7 @@ they expect strong earnings growth.
 Whether a Forward P/E ratio is 'good' or 'bad' can depend on
 whether the company's future earnings live up to expectations.\n"""
             )
-        elif choice == "priceToBook":
+        elif choice == "3":
             typewriter("------------------------------------\n")
             typewriter("       Price to Book                \n")
             typewriter("------------------------------------\n")
@@ -430,7 +408,7 @@ P/B ratio greater than 1 may suggest it's overvalued.
 However, these interpretations can vary depending on the industry and
 other factors.\n"""
             )
-        elif choice == "forwardEps":
+        elif choice == "4":
             typewriter("------------------------------------\n")
             typewriter("       Forward EPS                  \n")
             typewriter("------------------------------------\n")
@@ -450,7 +428,7 @@ However, it's important to remember that these are only estimates and
 actual results may vary.\n
 """
             )
-        elif choice == "debtToEquity":
+        elif choice == "5":
             typewriter("------------------------------------\n")
             typewriter("            Debt to Equity          \n")
             typewriter("------------------------------------\n")
@@ -471,7 +449,7 @@ Investors often use this ratio to compare the capital structure of
 different companies.
 """
             )
-        elif choice == "returnOnEquity":
+        elif choice == "6":
             typewriter("------------------------------------\n")
             typewriter("            Return on Equity        \n")
             typewriter("------------------------------------\n")
@@ -490,7 +468,7 @@ On the other hand, a low ROE might suggest that the company is
 not effectively using its resources to generate profits.
 """
             )
-        elif choice == "returnOnAssets":
+        elif choice == "7":
             typewriter("------------------------------------\n")
             typewriter("            Return on Assets        \n")
             typewriter("------------------------------------\n")
@@ -510,7 +488,7 @@ a lot of money in assets, but it's not generating a lot of profit from
 these investments.\n
 """
             )
-        elif choice == "revenueGrowth":
+        elif choice == "8":
             typewriter("------------------------------------\n")
             typewriter("            Revenue Growth          \n")
             typewriter("------------------------------------\n")
@@ -522,7 +500,7 @@ This gives investors and other stakeholders an idea of how quickly
 the company is growing its sales revenue.\n
 """
             )
-        elif choice == "quickRatio":
+        elif choice == "9":
             typewriter("------------------------------------\n")
             typewriter("            Quick Ratio             \n")
             typewriter("------------------------------------\n")
@@ -535,7 +513,7 @@ It's calculated as (Current Assets - Inventory) / Current Liabilities.
 A higher quick ratio means a more liquid current position.\n
 """
             )
-        elif choice == "dividendYield":
+        elif choice == "10":
             typewriter("------------------------------------\n")
             typewriter("            Dividend Yield          \n")
             typewriter("------------------------------------\n")
@@ -549,7 +527,7 @@ A higher dividend yield means the investor is getting a higher
 return on their investment.\n
 """
             )
-        elif choice == "quarterlyReturn":
+        elif choice == "11":
             typewriter("------------------------------------\n")
             typewriter("            Quarterly Return        \n")
             typewriter("------------------------------------\n")
@@ -565,6 +543,8 @@ value over the quarter.\n
             )
         else:
             print("invalid input, try again:")
+            print("make sure you have no spaces\
+                after your number")
 
 
 def calculate_percentile_rank(df):
@@ -685,9 +665,9 @@ def choose_companies(df):
     typewriter("-------------------------------------------\
 ----------------\n")
     typewriter(
-        "You must choose between 3 and 100 and the number cannot\
- be greater than the total number of companies listed\
- in the table \n"
+        "You must choose more than 3 and the number cannot\
+ be greater than the total \nnumber of companies listed\
+ in the table - note index starts with 0 \n"
     )
     while True:
         portfolio_size = input("Enter your number here: ")
@@ -738,8 +718,7 @@ def validate_number(portfolio_size, df):
         return False
     
     if (
-        portfolio_size > 100
-        or portfolio_size > df["symbols"].count()
+        portfolio_size > df["symbols"].count()
         or portfolio_size < 3
     ):
         print("You have not chosen a valid portfolio size,\
@@ -833,7 +812,7 @@ def combine_stocks(tickers):
     return data_frames
 
 
-def typewriter(input_text, speed=0.025):
+def typewriter(input_text, speed=0.0025):
     """
     Prints out the input text at a specified speed to
     simulate the effect of a typewriter.
@@ -889,12 +868,18 @@ def hpp_optimization(portfolio_prices, latest_prices):
     typewriter("-----------------------------------------\n")
     typewriter("Please input how much you would like to invest\
  in your portfolio:\n")
-    typewriter("There is a minimum limit of €500:\n")
+    typewriter("There is a minimum limit of 1000 and max limit of 9999999:\n")
     while True:
         investment = input("Enter your investment number here:\n")
-        investment = int(investment)
-        if investment > 499:
-            break
+        try:
+            investment = int(investment)
+            if investment > 999 and investment < 10000000:
+                break
+            else:
+                print("Invalid Input: Your input must be between 1000 and\
+ 9999999. Please try again.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
     da = DiscreteAllocation(weights,
                             latest_prices,
                             total_portfolio_value=investment)
