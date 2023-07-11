@@ -787,7 +787,7 @@ def combine_stocks(tickers):
     return data_frames
 
 
-def typewriter(input_text, speed=0.25):
+def typewriter(input_text, speed=0.025):
     """
     Prints out the input text at a specified speed to
     simulate the effect of a typewriter.
