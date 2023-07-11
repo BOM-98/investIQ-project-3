@@ -20,11 +20,11 @@ def main():
     # Function to scrape tickers from chosen index
     symbols = scrape_company_tickers(chosen_index)
     # Function to scrape financial infromation from tickers that were scraped
-    fundamentals_data = collect_data(symbols)
+    fundamentals_data, symbols = collect_data(symbols)
 
     # Step 2: Choosing stocks
     # Function to calculate quarterly returns from each stock from our index
-    fundamentals_data["quarterlyReturn"] = process_data(symbols)
+    fundamentals_data["quarterlyReturn"] = process_data(fundamentals_data['symbol'])
     print("----------------------------------------------------")
     typewriter("Here are the fundamentals for your list of companies: \n")
     print("----------------------------------------------------")

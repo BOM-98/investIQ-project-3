@@ -15,11 +15,14 @@ from pypfopt.risk_models import CovarianceShrinkage
 from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
 from pypfopt import HRPOpt
+import requests
 import time
+from urllib.error import HTTPError
 
 # The start and end date range for the stock data we will be analysing
 start = dt.datetime.now() - dt.timedelta(days=365)
 end = dt.datetime.now()
+index_choice = ""
 
 
 def get_companies_list():
@@ -192,13 +195,39 @@ def collect_data(symbols):
         KeyError: If the fetched data does not contain
         one of the chosen financial measures.
     """
+    
+    # fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
+    # symbols = fundamentals_data["symbol"]
+    # return fundamentals_data, symbols
+
     typewriter("first we need to fetch the company financials\
  for each stock...\n")
     stocks_list = []
     for ticker in symbols:
-        print(f"Fetching financial data for {ticker}")
-        stocks_list.append(yf.Ticker(ticker).info)
-
+        try:
+            print(f"Fetching financial data for {ticker}")
+            stocks_list.append(yf.Ticker(ticker).info)
+            time.sleep(1)  # Add a delay of 1 second between each request
+        except Exception as err:
+            print(f"HTTP error occurred: {err}")
+            print("Yahoo Finance has limited the number of requests")
+            print("We need to stop the companies fetching process here")
+            print("Instead we will use our pre-fetched data")
+            if index_choice == "dow":
+                fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
+                symbols = fundamentals_data["symbol"]
+                return fundamentals_data, symbols
+                
+            elif index_choice == "sap100":
+                fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
+                symbols = fundamentals_data["symbol"]
+                return fundamentals_data, symbols
+            elif index_choice == "sap500":
+                fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
+                symbols = fundamentals_data["symbol"]
+                return fundamentals_data, symbols
+            break
+        
     typewriter(
         "InvestIQ is calculating your company fundamentals - this\
  may take a minute or two...\n"
@@ -222,7 +251,17 @@ def collect_data(symbols):
     stock_data = pd.DataFrame(stocks_list)
     # # Select only the columns in the fundamentals list
     fundamentals_data = stock_data[fundamentals]
-    return fundamentals_data
+    
+    # Save the DataFrame to a CSV file
+    if index_choice == "dow":
+        return fundamentals_data, symbols
+    elif index_choice == "sap100":
+        fundamentals_data.to_csv('fundamentals_data_sap100.csv', index=False)
+        return fundamentals_data, symbols
+    elif index_choice == "sap500":
+        fundamentals_data.to_csv('fundamentals_data_sap500.csv', index=False)
+        return fundamentals_data, symbols
+    return fundamentals_data, symbols
 
 
 def process_data(tickers, start=start, end=end):
@@ -783,7 +822,14 @@ def combine_stocks(tickers):
     data_frames = pd.DataFrame()
     for i in tickers:
         data_frames[i] = pull_returns(i, start, end)
-    typewriter("Portfolio weights have been caluclated \n")
+        time.sleep(1)  # Add a delay of 1 second between each request
+        
+    if index_choice == "dow":
+        data_frames.to_csv('pricing_data_dow.csv', index=False)
+    elif index_choice == "sap100":
+        data_frames.to_csv('pricing_data_sap100.csv', index=False)
+    elif index_choice == "sap500":
+        data_frames.to_csv('pricing_data_sap500.csv', index=False)
     return data_frames
 
 
