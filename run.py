@@ -16,10 +16,10 @@ from utils import *
 def main():
     """
     Main function that runs the program
-    
-    This function handles the high-level logic of the program. 
+
+    This function handles the high-level logic of the program.
     It calls the functions that are responsible for the following:
-    
+
     """
     # Step 1: Choosing Index
     # Function to pick index
@@ -31,7 +31,8 @@ def main():
 
     # Step 2: Choosing stocks
     # Function to calculate quarterly returns from each stock from our index
-    fundamentals_data["quarterlyReturn"] = process_data(fundamentals_data['symbol'])
+    fundamentals_data["quarterlyReturn"] = process_data(
+        fundamentals_data['symbol'])
     print("----------------------------------------------------")
     typewriter("Here are the fundamentals for your list of companies: \n")
     print("----------------------------------------------------")

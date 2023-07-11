@@ -44,7 +44,7 @@ def get_companies_list():
     Raises:
         ValueError: If the user's input is not 'y' or 'Y
     """
-  
+
     # URL of the Wikipedia page from which to scrape
     # the Dow Jones company list
     url_dow = "https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average"
@@ -112,7 +112,7 @@ def scrape_company_tickers(index):
     """
     Extract the company tickers from an index's Wikipedia page.
 
-    This function copies the stock tickers from the Dow Jones Industrial 
+    This function copies the stock tickers from the Dow Jones Industrial
     Average index pages on Wikipedia.
     It pulls the tables from the Wikipedia page using
     pandas and then extracts the ticker symbols from the 'Symbol' column.
@@ -166,68 +166,10 @@ def collect_data(symbols):
         KeyError: If the fetched data does not contain
         one of the chosen financial measures.
     """
-    
+
     fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
     symbols = fundamentals_data["symbol"]
     return fundamentals_data, symbols
-
-#     typewriter("first we need to fetch the company financials\
-#  for each stock...\n")
-#     stocks_list = []
-#     for ticker in symbols:
-#         try:
-#             print(f"Fetching financial data for {ticker}")
-#             stocks_list.append(yf.Ticker(ticker).info)
-#             time.sleep(1)  # Add a delay of 1 second between each request
-#         except Exception as err:
-#             print(f"HTTP error occurred: {err}")
-#             print("Yahoo Finance has limited the number of requests")
-#             print("We need to stop the companies fetching process here")
-#             print("We must revert to our dow-jones data")
-#             if index_choice == "dow":
-#                 fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
-#                 symbols = fundamentals_data["symbol"]
-#                 return fundamentals_data, symbols               
-#             elif index_choice == "sap100":
-#                 fundamentals_data = pd.read_csv('fundamentals_data_dow.csv')
-#                 symbols = fundamentals_data["symbol"]
-#                 return fundamentals_data, symbols
-#             break
-        
-#     typewriter(
-#         "InvestIQ is calculating your company fundamentals - this\
-#  may take a minute or two...\n"
-#     )
-#     # Create a list of fundamental information that
-#     # we are interested in
-#     fundamentals = [
-#         "symbol",
-#         "marketCap",
-#         "forwardPE",
-#         "priceToBook",
-#         "forwardEps",
-#         "debtToEquity",
-#         "returnOnEquity",
-#         "returnOnAssets",
-#         "revenueGrowth",
-#         "quickRatio",
-#         "dividendYield",
-#     ]
-#     # Create a DataFrame from the info dictionary
-#     stock_data = pd.DataFrame(stocks_list)
-#     # # Select only the columns in the fundamentals list
-#     fundamentals_data = stock_data[fundamentals]
-    
-#     # Save the DataFrame to a CSV file
-#     if index_choice == "dow":
-#         return fundamentals_data, symbols
-#     elif index_choice == "sap100":
-#         fundamentals_data.to_csv('fundamentals_data_sap100.csv', index=False)
-#         return fundamentals_data, symbols
-#     elif index_choice == "sap500":
-#         fundamentals_data.to_csv('fundamentals_data_sap500.csv', index=False)
-#         return fundamentals_data, symbols
-#     return fundamentals_data, symbols
 
 
 def process_data(tickers, start=start, end=end):
@@ -339,7 +281,7 @@ def fundamentals_information():
     print("9 for quickRatio")
     print("10 for dividendYield")
     print("11 for quarterlyReturn")
-    
+
     typewriter(
         "Otherwise to continue to the next step and rank your companies\
  press enter\n"
@@ -675,8 +617,8 @@ def choose_companies(df):
         if validate_number(portfolio_size, df):
             print("Data is valid")
             break
-    
-    portfolio_size = int(portfolio_size)        
+
+    portfolio_size = int(portfolio_size)
     portfolio_df = df.head(portfolio_size)
 
     typewriter("You have chosen your portfolio\n")
@@ -802,7 +744,7 @@ def combine_stocks(tickers):
     for i in tickers:
         data_frames[i] = pull_returns(i, start, end)
         time.sleep(1)  # Add a delay of 1 second between each request
-        
+   
     if index_choice == "dow":
         data_frames.to_csv('pricing_data_dow.csv', index=False)
     elif index_choice == "sap100":
@@ -812,7 +754,7 @@ def combine_stocks(tickers):
     return data_frames
 
 
-def typewriter(input_text, speed=0.0025):
+def typewriter(input_text, speed=0.025):
     """
     Prints out the input text at a specified speed to
     simulate the effect of a typewriter.
