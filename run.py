@@ -71,10 +71,10 @@ def main():
     typewriter("----------------------------------------------------\n")
     typewriter(
         "Here are your companies scored and ranked based \
-            on their fundamentals.\n"
+on their fundamentals.\n"
         "Fundamentals are displayed here as percentiles.\n"
         "The investIQ algorithm calculates company \
-            scores based on fundamentals.\n"
+scores based on fundamentals.\n"
     )
     typewriter("----------------------------------------------------\n")
     # Function to rank companies based on their fundamentals
