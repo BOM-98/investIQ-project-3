@@ -658,7 +658,7 @@ def validate_number(portfolio_size, df):
         print("Invalid data: portfolio size is not a number,\
  please try again.\n")
         return False
-    
+
     if (
         portfolio_size > df["symbols"].count()
         or portfolio_size < 3
@@ -744,7 +744,7 @@ def combine_stocks(tickers):
     for i in tickers:
         data_frames[i] = pull_returns(i, start, end)
         time.sleep(1)  # Add a delay of 1 second between each request
-   
+
     if index_choice == "dow":
         data_frames.to_csv('pricing_data_dow.csv', index=False)
     elif index_choice == "sap100":
