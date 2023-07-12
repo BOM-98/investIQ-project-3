@@ -9,7 +9,7 @@
  4. [ Code Structure and Logic ](#logic)  
  5. [ Testing ](#testing)  
  6. [ Deployment](#deployment)
- 7. [ bugs](#bugs)
+ 7. [ Bugs](#bugs)
  8. [ References](#references)  
  9. [ Acknowledgements](#acknowledgements)  
 
@@ -309,7 +309,8 @@ All python files passed with no errors found
     - [Black](https://github.com/psf/black) was used to format my code to adhere to correct standards.
     - [Codespaces](https://github.com/features/codespaces) was used to push my commits to my repository.
 - [Lucidchart](https://lucid.app) was used to generate flowcharts for the application.
-- [Visual Studio Code]() was the development environment used for this project. 
+- [Visual Studio Code]() was the development environment used for this project.
+- [CI Python Linter](https://pep8ci.herokuapp.com/) was used to check my python code against pep8 standards.  
 
 
 ## Libraries & Modules
@@ -353,7 +354,7 @@ None
 - Monopoly art from [emojicombos.com](https://emojicombos.com/monopoly-ascii-art).
 - Chat gpt generated the descriptions for each fundamental financial metric in the program.
 - [Python Style Guide](https://peps.python.org/pep-0008/#comments) was used for determining how to style my comments.
-- [CI Python Linter](https://pep8ci.herokuapp.com/) was used to check my python code against pep8 standards. 
+
 
 ---
 <a name="acknowledgements"></a>
