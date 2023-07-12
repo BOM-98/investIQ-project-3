@@ -86,8 +86,8 @@ InvestIQ makes creating your stock portfolio effortless.
     ![Portfolio Optimizer](assets/images/portfolio-optimizer.png)
     </details>
 
-- Investment Allocator: After calculating the optimal portfolio weights, the program prompts the user to input how much they intend to invest in stocks and returns to them to number of shares they should buy in each company, in addition to their expected returns, annual volatility and Sharpe Ratio (a measure of expected returns relative to risk). <strong>NOTE: The investment allocator may remove some stocks altogether if the risk/return profile of the stock is not good enough relative to the portfolio. 
-</strong>
+- Investment Allocator: After calculating the optimal portfolio weights, the program prompts the user to input how much they intend to invest in stocks and returns to them to number of shares they should buy in each company, in addition to their expected returns, annual volatility and Sharpe Ratio (a measure of expected returns relative to risk). <strong>NOTE: The investment allocator may remove some stocks altogether if the risk/return profile of the stock is not good enough relative to the portfolio. </strong>
+
     <details>
     <summary>Investment Allocator</summary>
 
