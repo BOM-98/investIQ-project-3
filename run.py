@@ -8,7 +8,12 @@ def main():
 
     This function handles the high-level logic of the program.
     It calls the functions that are responsible for the following:
-
+    Scraping company tickers
+    Scraping financial information
+    Presenting financial information
+    Ranking companies based on their fundamentals
+    Generating a portfolio
+    Calculating returns and volatility
     """
     # Step 1: Choosing Index
     # Function to pick index
