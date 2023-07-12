@@ -13,6 +13,8 @@
  8. [ References](#references)  
  9. [ Acknowledgements](#acknowledgements)  
 
+[Live Site](https://invest-iq-d9c52037fcda.herokuapp.com/)
+
 ---
 
 <a name="background"></a>
@@ -309,7 +311,7 @@ All python files passed with no errors found
     - [Black](https://github.com/psf/black) was used to format my code to adhere to correct standards.
     - [Codespaces](https://github.com/features/codespaces) was used to push my commits to my repository.
 - [Lucidchart](https://lucid.app) was used to generate flowcharts for the application.
-- [Visual Studio Code]() was the development environment used for this project.
+- [Visual Studio Code](https://code.visualstudio.com/) was the development environment used for this project.
 - [CI Python Linter](https://pep8ci.herokuapp.com/) was used to check my python code against pep8 standards.  
 
 
