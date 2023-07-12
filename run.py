@@ -1,15 +1,4 @@
-import pandas as pd
-import pandas_datareader.data as web
-import numpy as np
-import datetime as dt
-from datetime import datetime
-import yfinance as yf
-from yahoo_fin import stock_info as si
-from pypfopt.expected_returns import mean_historical_return
-from pypfopt.risk_models import CovarianceShrinkage
-from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt.discrete_allocation import DiscreteAllocation, get_latest_prices
-from pypfopt import HRPOpt
 from utils import *
 
 

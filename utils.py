@@ -1,4 +1,3 @@
-# Write your code to expect a terminal of 80 characters wide and 24 rows high
 from math import sqrt
 import pandas as pd
 import pandas_datareader.data as web
@@ -19,7 +18,7 @@ import requests
 import time
 from urllib.error import HTTPError
 
-# The start and end date range for the stock data we will be analysing
+# The start and end date range for the stock data we will be analyzing
 start = dt.datetime.now() - dt.timedelta(days=365)
 end = dt.datetime.now()
 index_choice = ""
@@ -27,7 +26,7 @@ index_choice = ""
 
 def get_companies_list():
     """
-    The function prompts the user to continue analysing
+    The function prompts the user to continue analyzing
     the dow jones stock index .The user needs to input their
     choice, which is later validated with the
     `validate_index` function. Once marked valid,
@@ -61,6 +60,7 @@ def get_companies_list():
 
         if validate_index(index_choice):
             print("Input is valid")
+            typewriter("Retrieving data...this may take a minute\n")
             break
 
     if index_choice == "y":
@@ -145,13 +145,6 @@ def collect_data(symbols):
     """
     Retrieves and processes financial data for the Dow Jones.
 
-    The yfinance library is used by this function to loop through a
-    list of stock symbols and retrieve financial data for each one.
-    After retrieving the data, it creates a DataFrame from it and
-    selects a subset of it that corresponds to a preset list of
-    important financial metrics.
-    The resultant DataFrame is given back.
-
     Args:
         symbols (list): A list of strings representing the
         stock symbols for which data is to be retrieved.
@@ -192,12 +185,6 @@ def process_data(tickers, start=start, end=end):
     Returns:
         list: A list of floats representing the calculated
         quarterly returns for each stock ticker.
-
-    Raises:
-        NameError: If `start` or `end` are not defined
-        elsewhere in the code.
-        Any exceptions raised by
-        `calculate_quarterly_return`.
     """
     returns_list = []
     for ticker in tickers:
