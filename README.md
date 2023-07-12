@@ -329,9 +329,9 @@ All python files passed with no errors found
 
 ### Fixed: 
 
-- yfinance imposed limits on information that could be fetched on the day before submission. This resulted in my code throwing errors due to 'Unauthorized Access' if a limit was reached and halting the program. As a result, I had to generate a csv version of my fundamentals data for the Dow Jones that the program could fall back to if it could not fetch financial information. 
+- yfinance imposed limits on information that could be fetched on the day before submission. This resulted in my code throwing errors due to 'Unauthorized Access' if a limit was reached and halting the program. As a result, I had to generate a `.csv` version of my fundamentals data for the Dow Jones that the program could fall back to if it could not fetch financial information. 
 
-- Using the yfinance api caused some problems as there was a lot of nan or missing values in the fundamentals I was looking for. To handle this and prevent errors, I removed any companies that had nan values in their fundamentals.  
+- Using the yfinance api caused some problems as there was a lot of `NaN` or missing values in the fundamentals I was looking for. To handle this and prevent errors, I removed any companies that had `NaN` values in their fundamentals.  
 
 ### Not fixed: 
 
