@@ -3,11 +3,23 @@
 
 ## Table of Contents
 
+ 1. [ Project Background ](#background)  
+ 2. [ Features](#features)  
+ 3. [ Roadmap](#roadmap) 
+ 4. [ Code Structure and Logic ](#logic)  
+ 5. [ Testing ](#testing)  
+ 6. [ Deployment](#deployment)
+ 7. [ bugs](#bugs)
+ 8. [ References](#references)  
+ 9. [ Acknowledgements](#acknowledgements)  
+
 ---
+
+<a name="background"></a>
 
 ## Project Background
 
-InvestIQ is a Python command line application built to assist users in creating an optimal stock portfolio from US publically listed companies. Programs exist to help people optimize their stock portfolio in order to maximize their sharpe ratio - i.e. their return relative to their risk. However, these programs presuppose that users already know which stocks they should consider. Only after the user has added their stocks do the programs work to optimize how much should be allocated towards each stock. Some programs exist to help people assess which stocks to consider using tecnhical analysis - examining past pricing data. However these are separate from the programs that optimize the portfolios. There is a gap in helping people to choose which companies to include in your porfolio by using fundamental analysis - analysis using company financial reports instead of past pricing data. There is a further gap to combine this approach with portfolio optimization to make sure the user picks the best stocks and then optimizes them in the one place.
+InvestIQ is a Python command line application built to assist users in creating an optimal stock portfolio from US publicly listed companies. Programs exist to help people optimize their stock portfolio in order to maximize their sharpe ratio - i.e. their return relative to their risk. However, these programs presuppose that users already know which stocks they should consider. Only after the user has added their stocks do the programs work to optimize how much should be allocated towards each stock. Some programs exist to help people assess which stocks to consider using technical analysis - examining past pricing data. However these are separate from the programs that optimize the portfolios. There is a gap in helping people to choose which companies to include in your portfolio by using fundamental analysis - analysis using company financial reports instead of past pricing data. There is a further gap to combine this approach with portfolio optimization to make sure the user picks the best stocks and then optimizes them in the one place.
 
 Invest IQ uses an algorithm to rank stocks from the Dow Jones using fundamental analysis, and create an optimized portfolio from those stocks to give users the highest return for a given level of risk. By harnessing the capabilities of Python, InvestIQ can perform thousands of calculations within a matter of minutes to provide users with their stock portfolios - significantly decreasing the amount of time and effort required on their part.
 
@@ -16,10 +28,11 @@ Users can select which stock index they want to analyze stocks from - rank those
 InvestIQ makes creating your stock portfolio effortless.
 
 ---
+<a name="features"></a>
 
 ## Features
 
-- On initialisation, InvestIQ explains to users the intent of the program before encouraging them to proceed through the program by pressing enter.
+- On initialization, InvestIQ explains to users the intent of the program before encouraging them to proceed through the program by pressing enter.
 
     <details>
     <summary>InvestIQ intro</summary>
@@ -63,7 +76,7 @@ InvestIQ makes creating your stock portfolio effortless.
     ![Ratio Explainer](assets/images/information-finder.png "Ratio Explainer")
     </details>
 
-- Portfolio Optimizer: The program takes the number of stocks the user has selected and calculates the optimial weights to be assigned towards each stock in the portfolio to produce the greatest returns at a given level of risk using Hierarchical Risk Parity Optimization(HRP). 
+- Portfolio Optimizer: The program takes the number of stocks the user has selected and calculates the optimal weights to be assigned towards each stock in the portfolio to produce the greatest returns at a given level of risk using Hierarchical Risk Parity Optimization(HRP). 
 
     <details>
     <summary>Portfolio Optimizer</summary>
@@ -80,26 +93,29 @@ InvestIQ makes creating your stock portfolio effortless.
     </details>
 
 ---
+<a name="roadmap"></a>
 
 ## Roadmap
 
 - Incorporate Regression Analysis: 
-    The weights applied to each fundamental ratio were somewhat arbitratily applied based on some limited research from finance courses in college. Future versions of this software could implement regression analysis to determine how company fundamentals predict future stock prices and apply more rigorous weights to each fundamental ratio. 
+    The weights applied to each fundamental ratio were somewhat arbitrarily applied based on some limited research from finance courses in college. Future versions of this software could implement regression analysis to determine how company fundamentals predict future stock prices and apply more rigorous weights to each fundamental ratio. 
 
 - Optionality on portfolio optimization methods: 
-    This program uses a relatively conservative method (Hierarchical Risk Parity Optimization) to allocate funds towards each stock. Future iterations of this program could give users the added optionality to decide between other optimization approachs e.g. mean-variance optimization. 
+    This program uses a relatively conservative method (Hierarchical Risk Parity Optimization) to allocate funds towards each stock. Future iterations of this program could give users the added optionality to decide between other optimization approaches e.g. mean-variance optimization. 
 
 - Incorporating Technical Analysis:
-    Future iterations of this program could implement techncial indicators into the score generated by the algorithm to provide a more robust ranking of stocks. 
+    Future iterations of this program could implement technical indicators into the score generated by the algorithm to provide a more robust ranking of stocks. 
 
 - Incorporating other financial APIs: 
-    yfinance stopped working and prevented me accessing financial data which stopped my program from working the day before this project was due to be submitted. As a result, I had to discard a lot of functions that were pulling fundamentals data from yfinance and fetch information from a csv file instead. In future, I would like to incorporate an API like polygon.io that is well maintained to retrieve dependable information and reintroduce my functions to pull financials data. 
+    yfinance stopped working and prevented me accessing financial data due to new rate limits which stopped my program from working the day before this project was due to be submitted. As a result, I had to discard a lot of functions that were pulling fundamentals data from yfinance and now fetch information from a csv file instead. In future, I would like to incorporate an API like `polygon.io` that is well maintained to retrieve dependable information and reintroduce my functions to pull financial data. This would also enable the user to choose between multiple indexes, and not just the Dow Jones, which was possible to do before yfinance's rate limits. 
 
 ---
-
+<a name="logic"></a>
 ## Code Structure and Logic
 
-The below flochart shows the logic of the code for the program: 
+### Logic
+
+The below flowchart shows the logic of the code for the program: 
 
 ![Code Logic Map](assets/images/logic-map.png)
 
@@ -109,6 +125,24 @@ The below flochart shows the logic of the code for the program:
 - Step 3: Determining the portfolio size and investment amount the user would like to have
 - Step 4: Calculating the optimal portfolio allocation for the user given their investment amount and chosen portfolio size
 
+### Data Structures
+The following are the main data structures used in my program to store and retrieve information required to create a stock portfolio. 
+
+- `fundamentals_data`: `type: dataFrame` This DataFrame contains the financial statistics and ratios for the stocks in the Dow Jones. The columns correspond to the selected financial metrics, which include "symbol", "marketCap", "forwardPE", "priceToBook", "forwardEps", "debtToEquity", "returnOnEquity", "returnOnAssets", "revenueGrowth", "quickRatio", and "dividendYield". Each row corresponds to a different stock symbol. This DataFrame is created by fetching data from Yahoo Finance using the yfinance library, and it's used to analyze the financial health and performance of the companies.
+
+- a `.csv` file `fundamentals_data_dow.csv` was generated using yfinance as a local backup of the Dow Jones stocks fundamentals. As yfinance proved to be unreliable, the program can now reference this source to retrieve the fundamentals information for all of the stocks and display it in the `fundamentals_data` dataFrame. 
+
+- `symbols`: `type: dataFrame`This DataFrame contains the list of stock symbols for which data is to be retrieved. The stock symbols are read from the Wikipedia page corresponding to the relevant stock Index. It's used to loop through and fetch the financial data for each symbol.
+
+- `returns_list`: `type: list` This list is used to collect the quarterly returns on each company and is later used to append those returns onto the `fundamentals_data` dataFrame. 
+
+- `ranked_percentiles`: `type: dataFrame` This dataFrame is generated using a lambda function which converts all values from `fundamentals_data` into percentiles and inverts the percentile rank for "forwardEPS" and "debtToEquity" as lower values are better for those metrics. 
+
+- `portfolio_prices` : `type: dataFrame` This dataFrame is used to store the historical prices of the companies chosen in the portfolio, using the "pull_returns()" and "combine_stocks()" functions. This information is used to calculate the expected returns and variance of the stocks. 
+
+---
+
+<a name="testing"></a>
 ## Testing
 
 ### Testing Phase
@@ -198,12 +232,12 @@ I did not anticipate the user entering a number with a space afterwards. I adjus
 
 > Choosing your portfolio size
 Error Msg: You have not chosen a valid portfolio size, please try again.
-Only number values between 3 and the dataframe size are accepted
+Only number values between 3 and the dataFrame size are accepted
 
 | Test | Result |
 |--|--|
 |User tried to enter a number less than 3| Pass|
-|User tried to enter a number greater than dataframe size|Pass|
+|User tried to enter a number greater than dataFrame size|Pass|
 |User tried to enter an empty selection|Pass|
 |User tried to enter a special symbol|Pass|
 |User tried to enter a letter / word|Pass|
@@ -234,9 +268,10 @@ Error Msg: invalid input, try again.
 
 ![Pep8](assets/images/ci-linter-check.png)
 
-All python files passed with no errros found
+All python files passed with no errors found
 
 ---
+<a name="deployment"></a>
 
 ## Deployment
 
@@ -246,16 +281,16 @@ All python files passed with no errros found
 - Name the application 'InvestIq' select the EU as your region and proceed to "Create app".
 - On the next page click on the Settings tab to adjust the settings.
 - First we need to open 'config vars' and add a key of 'port' with a value of '8000'. Then click the 'add' button.
-- To run the program you need to install Buildpacks. 
+- To run the program you need to install buildpacks. 
 - The python buildpack is installed first by selecting 'Buildpacks' in the settings tab and selecting 'python'
 - node.js is also needed to run the program - this is done by selecting 'node.js' within buildpacks also
-- These install future dependancies that we need outside of the requirements file.
+- These install future dependencies that we need outside of the requirements file.
 - Python needs to be positioned above node.js - make sure that python is first.
 - The ordering is as follows:
 1. `heroku/python`
 2. `heroku/nodejs`
-- We then click on the 'deloyment' tab to select our deployment method.
-- This project was connected with github with the resepective repository.
+- We then click on the 'deployment' tab to select our deployment method.
+- This project was connected with github with the respective repository.
 - I searched for my 'InvestIQ' repository and clicked 'connect'. 
 - Next you select 'automatic deploy' as we want the program to be rebuilt every time we push to github for testing. 
 - For this option choose the branch to deploy and click enable automatic deploys.
@@ -274,22 +309,26 @@ All python files passed with no errros found
     - [Black](https://github.com/psf/black) was used to format my code to adhere to correct standards.
     - [Codespaces](https://github.com/features/codespaces) was used to push my commits to my repository.
 - [Lucidchart](https://lucid.app) was used to generate flowcharts for the application.
+- [Visual Studio Code]() was the development environment used for this project. 
 
 
 ## Libraries & Modules
 - The [yfinance](https://pypi.org/project/yfinance/) library was used for fetching financial information from individual stocks
-- The [Pandas](https://pandas.pydata.org/) library was used for processing the infromation fetched using yfinance.
+- The [Pandas](https://pandas.pydata.org/) library was used for processing the information fetched using yfinance.
 - [Pandas Datareader](https://pypi.org/project/pandas-datareader/) was used to read data from webpages. 
-- [PyPortfolioOpt](https://pypi.org/project/pyportfolioopt/) is a library that implements portfolio optimization methods.
+- [PyPortfolioOpt](https://pypi.org/project/pyportfolioopt/)https://scipy.org/ is a library that implements portfolio optimization methods.
 - [Datetime](https://pypi.org/project/DateTime/) is used to put parameters on date ranges for fetching company statistics.
+- [SciPy](https://scipy.org/) is used to calculate the percentile scores and optimal portfolio allocations for the stocks. 
 
 ---
+
+<a name="bugs"></a>
 
 ## Bugs
 
 ### Fixed: 
 
-- yfinance imposed limits on information that could be fetched on the day before submission. This resulted in my code throwing errors due to 'Unauthorized Access' if a limit was reached and halting the program. As a result, I had to generate a csv version of my fundamentals data for the Dow Jones that the program could fall back to if it could not fetch financials information. 
+- yfinance imposed limits on information that could be fetched on the day before submission. This resulted in my code throwing errors due to 'Unauthorized Access' if a limit was reached and halting the program. As a result, I had to generate a csv version of my fundamentals data for the Dow Jones that the program could fall back to if it could not fetch financial information. 
 
 - Using the yfinance api caused some problems as there was a lot of nan or missing values in the fundamentals I was looking for. To handle this and prevent errors, I removed any companies that had nan values in their fundamentals.  
 
@@ -299,19 +338,25 @@ None
 
 ---
 
+<a name="references"></a>
+
 ## References 
 - [QuantDare's articule](https://quantdare.com/correlation-prices-returns/) was used to determine whether to calculate correlation on returns or prices between equities.
-- [codeCademy](www.codecademy.com) course Python for Finance was used to assist in scraping financial data and creating foundational functions such as variance, standard deviation and correlation coefficient
+- [codeCademy](www.codecademy.com) course Python for Finance was used to assist in scraping financial data and creating foundational functions such as variance, standard deviation and correlation coefficient.
 - [Investopedia's](https://www.investopedia.com/financial-edge/0910/6-basic-financial-ratios-and-what-they-tell-you.aspx#:~:text=Key%20Takeaways&text=There%20are%20six%20basic%20ratios,return%20on%20equity%20(ROE).) article on financial ratios was used to determine which ratios I need to evaluate my stocks
 - Information on how to gather stock information using yfinance was gathered from [Algovibes](https://www.youtube.com/watch?v=ZUQEd22oNek) Youtube video.
-- Inspiration on how to rank stocks was taken from [B/O Trading Blog's Article](https://medium.com/@chris_42047/a-weighted-ranking-system-for-stocks-python-tutorial-6af425ff65a4) where an example approach to scoring and applying weights to stocks was taken. 
-- Portfolio optimization methods were taken from [Sadrach Pierre's Artile](https://builtin.com/data-science/portfolio-optimization-python) on how to Optimize a stock portfolio using Python. 
+- Inspiration on how to rank stocks was taken from [B/O Trading Blog's Article](https://medium.com/@chris_42047/a-weighted-ranking-system-for-stocks-python-tutorial-6af425ff65a4) and also [Zhijing Eu's article](https://medium.com/analytics-vidhya/building-a-simple-stock-ranking-screening-tool-7bc10049e85#cfc6) where an example approaches to scoring and applying weights to stocks was provided.
+- [Sankha Mukherjee](https://medium.com/@sankha.mukherjee_007/company-valuation-with-python-166fe5ebb2c3) gave me information on how to approach valuing companies using Python.
+- How to deploy and use yfinance was informed by [Towards Data Science's Article](https://towardsdatascience.com/free-stock-data-for-python-using-yahoo-finance-api-9dafd96cad2e#:~:text=Rate%20Limitation&text=Using%20the%20Public%20API%20(without,of%2048%2C000%20requests%20a%20day).) on yfinance.
+-`Stack Overflow` was used extensively to overcome problems during the project, in particular how to [export stock data](https://stackoverflow.com/questions/72596204/function-to-export-multiple-yfinance-stocks-to-csv) to `.csv` files.  
+- Portfolio optimization methods, in particular the HRP optimization methods and logic, were taken from [Sadrach Pierre's Artile](https://builtin.com/data-science/portfolio-optimization-python) on how to Optimize a stock portfolio using Python. 
 - Monopoly art from [emojicombos.com](https://emojicombos.com/monopoly-ascii-art).
 - Chat gpt generated the descriptions for each fundamental financial metric in the program.
 - [Python Style Guide](https://peps.python.org/pep-0008/#comments) was used for determining how to style my comments.
-- [CI Python Linter](https://pep8ci.herokuapp.com/) was used to check my python code agains pep8 standards. 
+- [CI Python Linter](https://pep8ci.herokuapp.com/) was used to check my python code against pep8 standards. 
 
 ---
+<a name="acknowledgements"></a>
 
 ## Acknowledgements
 
