@@ -320,8 +320,8 @@ whether the company's future earnings live up to expectations.\n"""
             typewriter("------------------------------------\n")
             print(
                 """The Price-to-Book (P/B) ratio is a financial metric
-                used to assess the market's valuation of a company relative
-                to its book value.\n
+used to assess the market's valuation of a company relative
+to its book value.
 The book value is essentially the company's net worth if it were to be
 liquidated,
 i.e., all its assets sold and all its debts paid off. It's calculated
@@ -594,7 +594,7 @@ def choose_companies(df):
     typewriter("-------------------------------------------\
 ----------------\n")
     typewriter(
-        "You must choose more than 3 and the number cannot\
+        "You must choose 3 or more and the number cannot\
  be greater than the total \nnumber of companies listed\
  in the table - note index starts with 0 \n"
     )
